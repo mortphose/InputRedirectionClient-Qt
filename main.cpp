@@ -43,15 +43,18 @@ double previousLX=lx, previousLY=ly;
 QGamepadManager::GamepadButtons buttons = 0;
 u32 interfaceButtons = 0;
 QString ipAddress;
-int yAxisMultiplier = 1;
 bool monsterHunterCamera = false;
 bool rightStickSmash = false;
 bool isSmashingV = false;
 bool isSmashingH = false;
+int yAxisMultiplier = 1, yAxisMultiplierCpp = 1;
 
 bool touchScreenPressed;
+QSize touchScreenSize;
 QPoint touchScreenPosition;
 int touchScreenScale = 1;
+
+bool shouldSwapStick = false;
 
 QSettings settings("TuxSH", "InputRedirectionClient-Qt");
 
@@ -133,27 +136,6 @@ void sendFrame(void)
     u32 circlePadState = 0x7ff7ff;
     u32 cppState = 0x80800081;
 
-    if(lx != 0.0 || ly != 0.0)
-    {
-        u32 x = (u32)(lx * CPAD_BOUND + 0x800);
-        u32 y = (u32)(ly * CPAD_BOUND + 0x800);
-        x = x >= 0xfff ? (lx < 0.0 ? 0x000 : 0xfff) : x;
-        y = y >= 0xfff ? (ly < 0.0 ? 0x000 : 0xfff) : y;
-
-        circlePadState = (y << 12) | x;
-    }
-
-    if(rx != 0.0 || ry != 0.0 || irButtonsState != 0)
-    {
-        // We have to rotate the c-stick position 45°. Thanks, Nintendo.
-        u32 x = (u32)(M_SQRT1_2 * (rx + ry) * CPP_BOUND + 0x80);
-        u32 y = (u32)(M_SQRT1_2 * (ry - rx) * CPP_BOUND + 0x80);
-        x = x >= 0xff ? (rx < 0.0 ? 0x00 : 0xff) : x;
-        y = y >= 0xff ? (ry < 0.0 ? 0x00 : 0xff) : y;
-
-        cppState = (y << 24) | (x << 16) | (irButtonsState << 8) | 0x81;
-    }
-
     if(touchScreenPressed)
     {
         u32 x = (u32)(0xfff * std::min(std::max(0, touchScreenPosition.x()/touchScreenScale),
@@ -163,13 +145,44 @@ void sendFrame(void)
         touchScreenState = (1 << 24) | (y << 12) | x;
     }
 
-    QByteArray ba(20, 0);
-    qToLittleEndian(hidPad, (uchar *)ba.data());
-    qToLittleEndian(touchScreenState, (uchar *)ba.data() + 4);
-    qToLittleEndian(circlePadState, (uchar *)ba.data() + 8);
-    qToLittleEndian(cppState, (uchar *)ba.data() + 12);
-    qToLittleEndian(interfaceButtons, (uchar *)ba.data() + 16);
-    QUdpSocket().writeDatagram(ba, QHostAddress(ipAddress), 4950);
+    if(lx != 0.0 || ly != 0.0)
+      {
+          u32 x = (u32)(lx * CPAD_BOUND + 0x800);
+          u32 y = (u32)(ly * CPAD_BOUND + 0x800);
+          x = x >= 0xfff ? (lx < 0.0 ? 0x000 : 0xfff) : x;
+          y = y >= 0xfff ? (ly < 0.0 ? 0x000 : 0xfff) : y;
+
+          circlePadState = (y << 12) | x;
+      }
+
+      if(rx != 0.0 || ry != 0.0 || irButtonsState != 0)
+      {
+          // We have to rotate the c-stick position 45°. Thanks, Nintendo.
+          u32 x = (u32)(M_SQRT1_2 * (rx + ry) * CPP_BOUND + 0x80);
+          u32 y = (u32)(M_SQRT1_2 * (ry - rx) * CPP_BOUND + 0x80);
+          x = x >= 0xff ? (rx < 0.0 ? 0x00 : 0xff) : x;
+          y = y >= 0xff ? (ry < 0.0 ? 0x00 : 0xff) : y;
+
+          cppState = (y << 24) | (x << 16) | (irButtonsState << 8) | 0x81;
+      }
+
+      QByteArray ba(20, 0);
+      qToLittleEndian(hidPad, (uchar *)ba.data());
+      qToLittleEndian(touchScreenState, (uchar *)ba.data() + 4);
+      qToLittleEndian(circlePadState, (uchar *)ba.data() + 8);
+      qToLittleEndian(cppState, (uchar *)ba.data() + 12);
+      qToLittleEndian(interfaceButtons, (uchar *)ba.data() + 16);
+      QUdpSocket().writeDatagram(ba, QHostAddress(ipAddress), 4950);
+
+//      if(touchScreenPressed)
+//      {
+//          u32 x = (u32)(0xfff * std::min(std::max(0, touchScreenPosition.x()),
+//                                         touchScreenSize.width())) / touchScreenSize.width();
+//          u32 y = (u32)(0xfff * std::min(std::max(0, touchScreenPosition.y()),
+//                                         touchScreenSize.height())) / touchScreenSize.height();
+//
+//          touchScreenState = (1 << 24) | (y << 12) | x;
+//      }
 
 }
 
@@ -240,98 +253,116 @@ struct GamepadMonitor : public QObject {
 
             sendFrame();
         });
+
         connect(QGamepadManager::instance(), &QGamepadManager::gamepadAxisEvent, this,
             [](int deviceId, QGamepadManager::GamepadAxis axis, double value)
         {
             (void)deviceId;
             (void)value;
-            switch(axis)
-            {
-                case QGamepadManager::AxisLeftX:
-                    lx = value;
-                    previousLX = lx;
-                    break;
-                case QGamepadManager::AxisLeftY:
-                    ly = yAxisMultiplier * -value; // for some reason qt inverts this
-                    previousLY = ly;
-                    break;
+            QGamepadManager::GamepadAxis axLeftX = QGamepadManager::AxisLeftX,
+                                         axLeftY= QGamepadManager::AxisLeftY,
+                                         axRightX= QGamepadManager::AxisRightX,
+                                         axRightY= QGamepadManager::AxisRightY;
 
-                case QGamepadManager::AxisRightX:
-                    rx = value;
-                    if (monsterHunterCamera)
-                    {
-                        if (value > -1.2 && value < -0.5) // RS tilted left
-                        {
-                            buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsMiddle[3]); // press Left
-                        } else if (value > 0.5 && value < 1.2) // RS tilted right
-                        {
-                            buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsMiddle[2]); // press Right
-                        } else { // RS neutral, release buttons
-                            buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsMiddle[3])); // Release Left
-                            buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsMiddle[2])); // release Right
-                        }
-                    } else if (rightStickSmash)
-                    {
-                        if (value > -1.2 && value < -0.5) // RS tilted left
-                        {
-                            isSmashingH = true;
-                            buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsAB[0]); // press A
-                            lx = -1.2;
-                        } else if (value > 0.5 && value < 1.2) // RS tilted right
-                        {
-                            isSmashingH = true;
-                            buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsAB[0]); // press A
-                            lx = 1.2;
-                        } else { // RS neutral, release buttons
-                            if (isSmashingH)
-                            {
-                                if (!isSmashingV)
-                                    buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsAB[0])); // Release A
-                                lx = previousLX;
-                                isSmashingH = false;
-                            }
-                        }
-                    }
-                    break;
-                case QGamepadManager::AxisRightY:
-                    ry = yAxisMultiplier * -value; // for some reason qt inverts this
-                    if (monsterHunterCamera)
-                    {
-                        if (ry > -1.2 && ry < -0.5) // RS tilted down
-                        {
-                            buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsMiddle[5]); // press Down
-                        } else if (ry > 0.5 && ry < 1.2) // RS tilted up
-                        {
-                            buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsMiddle[4]); // press Up
-                        } else { // RS neutral, release buttons
-                            buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsMiddle[5])); // release Down
-                            buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsMiddle[4])); // Release Up
-                        }
-                    } else if (rightStickSmash)
-                    {
-                        if (ry > -1.2 && ry < -0.5) // RS tilted down
-                        {
-                            isSmashingV = true;
-                            buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsAB[0]); // press A
-                            ly = -1.2;
-                        } else if (ry > 0.5 && ry < 1.2) // RS tilted up
-                        {
-                            isSmashingV = true;
-                            buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsAB[0]); // press A
-                            ly = 1.2;
-                        } else { // RS neutral, release button A
-                            if (isSmashingV)
-                            {
-                                if (!isSmashingH)
-                                    buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsAB[0])); // Release A
-                                ly = previousLY;
-                                isSmashingV = false;
-                            }
-                        }
-                    }
-                    break;
-                default: break;
+            if(shouldSwapStick)
+            {
+                axLeftX = QGamepadManager::AxisRightX;
+                axLeftY = QGamepadManager::AxisRightY;
+
+                axRightX = QGamepadManager::AxisLeftX;
+                axRightY = QGamepadManager::AxisLeftY;
             }
+
+            if(axis==axLeftX)
+            {
+                lx = value;
+                previousLX = lx;
+            }
+            else
+            if(axis==axLeftY)
+            {
+                ly = yAxisMultiplier * -value; // for some reason qt inverts this
+                previousLY = ly;
+            }
+            else
+            if(axis==axRightX)
+            {
+                rx = value;
+                if (monsterHunterCamera)
+                {
+                    if (value > -1.2 && value < -0.5) // RS tilted left
+                    {
+                        buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsMiddle[3]); // press Left
+                    } else if (value > 0.5 && value < 1.2) // RS tilted right
+                    {
+                        buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsMiddle[2]); // press Right
+                    } else { // RS neutral, release buttons
+                        buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsMiddle[3])); // Release Left
+                        buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsMiddle[2])); // release Right
+                    }
+                } else if (rightStickSmash)
+                {
+                    if (value > -1.2 && value < -0.5) // RS tilted left
+                    {
+                        isSmashingH = true;
+                        buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsAB[0]); // press A
+                        lx = -1.2;
+                    } else if (value > 0.5 && value < 1.2) // RS tilted right
+                    {
+                        isSmashingH = true;
+                        buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsAB[0]); // press A
+                        lx = 1.2;
+                    } else { // RS neutral, release buttons
+                        if (isSmashingH)
+                        {
+                            if (!isSmashingV)
+                                buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsAB[0])); // Release A
+                            lx = previousLX;
+                            isSmashingH = false;
+                        }
+                    }
+                }
+            }
+            else
+            if(axis==axRightY)
+            {
+                ry = yAxisMultiplierCpp * -value;
+                if (monsterHunterCamera)
+                {
+                    if (ry > -1.2 && ry < -0.5) // RS tilted down
+                    {
+                        buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsMiddle[5]); // press Down
+                    } else if (ry > 0.5 && ry < 1.2) // RS tilted up
+                    {
+                        buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsMiddle[4]); // press Up
+                    } else { // RS neutral, release buttons
+                        buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsMiddle[5])); // release Down
+                        buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsMiddle[4])); // Release Up
+                    }
+                } else if (rightStickSmash)
+                {
+                    if (ry > -1.2 && ry < -0.5) // RS tilted down
+                    {
+                        isSmashingV = true;
+                        buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsAB[0]); // press A
+                        ly = -1.2;
+                    } else if (ry > 0.5 && ry < 1.2) // RS tilted up
+                    {
+                        isSmashingV = true;
+                        buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsAB[0]); // press A
+                        ly = 1.2;
+                    } else { // RS neutral, release button A
+                        if (isSmashingV)
+                        {
+                            if (!isSmashingH)
+                                buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsAB[0])); // Release A
+                            ly = previousLY;
+                            isSmashingV = false;
+                        }
+                    }
+                }
+            }
+
             sendFrame();
         });
     }
@@ -358,6 +389,31 @@ struct TouchScreen : public QDialog {
 //        bgLabel->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
     }
 
+//    void resizeEvent(QResizeEvent* e)
+//    {
+//
+//        QSize newWinSize = e->size();
+//        QSize curWinSize = e->oldSize();
+//        QSize propWinSize = e->size();
+//
+//        if(curWinSize.height() != newWinSize.height())
+//        {
+//            propWinSize.setWidth((TOUCH_SCREEN_WIDTH*newWinSize.height())/TOUCH_SCREEN_HEIGHT);
+//           propWinSize.setHeight(newWinSize.height());
+//        }
+//
+//        if(curWinSize.width() != newWinSize.width())
+//        {
+//            propWinSize.setWidth(newWinSize.width());
+//           propWinSize.setHeight((TOUCH_SCREEN_HEIGHT*newWinSize.width())/TOUCH_SCREEN_WIDTH);
+//        }
+//
+//        touchScreenSize = propWinSize;
+//        this->resize(propWinSize);
+//        bgLabel->setFixedHeight(this->height());
+//        bgLabel->setFixedWidth(this->width());
+//    }
+
     void mousePressEvent(QMouseEvent *ev)
     {
         if(ev->button() == Qt::LeftButton)
@@ -366,7 +422,6 @@ struct TouchScreen : public QDialog {
             touchScreenPosition = ev->pos();
             sendFrame();
         }
-
 //        if(ev->button() == Qt::RightButton)
 //        {
 //
@@ -664,7 +719,7 @@ class Widget : public QWidget
 private:
     QVBoxLayout *layout;
     QFormLayout *formLayout;
-    QCheckBox *invertYCheckbox, *mhCameraCheckbox, *rsSmashCheckbox;
+    QCheckBox *invertYCheckbox, *invertYCppCheckbox, *swapSticksCheckbox, *mhCameraCheckbox, *rsSmashCheckbox;
     QPushButton *homeButton, *powerButton, *longPowerButton, *remapConfigButton;
     QLineEdit *addrLineEdit, *touchScreenScaleEdit;
     QSlider *touchOpacitySlider;
@@ -682,13 +737,16 @@ public:
         touchScreenScaleEdit->setText("1");
 
         invertYCheckbox = new QCheckBox(this);
+        invertYCppCheckbox = new QCheckBox(this);
+        swapSticksCheckbox = new QCheckBox(this);
         mhCameraCheckbox = new QCheckBox(this);
         rsSmashCheckbox = new QCheckBox(this);
 
         formLayout = new QFormLayout;
-
         formLayout->addRow(tr("IP &address"), addrLineEdit);
         formLayout->addRow(tr("&Invert Y axis"), invertYCheckbox);
+        formLayout->addRow(tr("&Invert Cpp Y axis"), invertYCppCheckbox);
+        formLayout->addRow(tr("&Swap Analog Sticks"), swapSticksCheckbox);
         formLayout->addRow(tr("RightStick &DPad"), mhCameraCheckbox);
         formLayout->addRow(tr("RightStick &Smash"), rsSmashCheckbox);
         formLayout->addRow(tr("Touch Screen &Scale"), touchScreenScaleEdit);
@@ -761,21 +819,55 @@ public:
             }
         });
 
-        connect(rsSmashCheckbox, &QCheckBox::stateChanged, this,
+        connect(invertYCppCheckbox, &QCheckBox::stateChanged, this,
                 [](int state)
         {
             switch(state)
             {
                 case Qt::Unchecked:
-                    rightStickSmash = false;
-                    settings.setValue("rightStickSmash", false);
+                    yAxisMultiplierCpp = 1;
+                    settings.setValue("invertY", false);
                     break;
                 case Qt::Checked:
-                    rightStickSmash = true;
-                    settings.setValue("rightStickSmash", true);
+                    yAxisMultiplierCpp = -1;
+                    settings.setValue("invertY", true);
                     break;
                 default: break;
             }
+        });
+
+        connect(rsSmashCheckbox, &QCheckBox::stateChanged, this,
+                [](int state)
+        {
+             switch(state)
+             {
+                 case Qt::Unchecked:
+                     rightStickSmash = false;
+                     settings.setValue("rightStickSmash", false);
+                     break;
+                 case Qt::Checked:
+                     rightStickSmash = true;
+                     settings.setValue("rightStickSmash", true);
+                     break;
+                 default: break;
+             }
+
+         });
+
+        connect(swapSticksCheckbox, &QCheckBox::stateChanged, this,
+                [](int state)
+        {
+            switch(state)
+            {
+                case Qt::Unchecked:
+                    shouldSwapStick = false;
+                    break;
+                case Qt::Checked:
+                    shouldSwapStick = true;
+                    break;
+                default: break;
+            }
+
         });
 
         connect(homeButton, &QPushButton::pressed, this,
@@ -842,7 +934,6 @@ public:
         invertYCheckbox->setChecked(settings.value("invertY", false).toBool());
         mhCameraCheckbox->setChecked(settings.value("monsterHunterCamera", false).toBool());
         rsSmashCheckbox->setChecked(settings.value("rightStickSmash", false).toBool());
-
     }
 
     void show(void)
