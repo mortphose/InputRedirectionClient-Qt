@@ -495,6 +495,7 @@ private:
     QLineEdit *touchButton1XEdit, *touchButton1YEdit,
         *touchButton2XEdit, *touchButton2YEdit;
     QPushButton *saveButton, *closeButton;
+    QCheckBox *invertYCheckbox, *invertYCppCheckbox, *swapSticksCheckbox, *mhCameraCheckbox, *rsSmashCheckbox;
 
     QComboBox* populateItems(QGamepadManager::GamepadButton button)
     {
@@ -576,6 +577,12 @@ public:
         touchButton2YEdit->setClearButtonEnabled(true);
         touchButton2YEdit->setText(settings.value("touchButton2Y", "0").toString());
 
+        invertYCheckbox = new QCheckBox(this);
+        invertYCppCheckbox = new QCheckBox(this);
+        swapSticksCheckbox = new QCheckBox(this);
+        mhCameraCheckbox = new QCheckBox(this);
+        rsSmashCheckbox = new QCheckBox(this);
+
         formLayout = new QFormLayout;
 
         formLayout->addRow(tr("A Button"), comboBoxA);
@@ -595,12 +602,19 @@ public:
         formLayout->addRow(tr("Power-Long"), comboBoxPowerLong);
         formLayout->addRow(tr("ZL Button"), comboBoxZL);
         formLayout->addRow(tr("ZR Button"), comboBoxZR);
+
         formLayout->addRow(tr("Touch Button 1"), comboBoxTouch1);
         formLayout->addRow(tr("Touch Button X"), touchButton1XEdit);
         formLayout->addRow(tr("Touch Button Y"), touchButton1YEdit);
         formLayout->addRow(tr("Touch Button 2"), comboBoxTouch2);
         formLayout->addRow(tr("Touch Button X"), touchButton2XEdit);
         formLayout->addRow(tr("Touch Button Y"), touchButton2YEdit);
+
+        formLayout->addRow(tr("&Invert Y axis"), invertYCheckbox);
+        formLayout->addRow(tr("&Invert Cpp Y "), invertYCppCheckbox);
+        formLayout->addRow(tr("&Swap Sticks"), swapSticksCheckbox);
+        formLayout->addRow(tr("RightStick &DPad"), mhCameraCheckbox);
+        formLayout->addRow(tr("RightStick &Smash"), rsSmashCheckbox);
 
         saveButton = new QPushButton(tr("&SAVE"), this);
         closeButton = new QPushButton(tr("&CANCEL"), this);
@@ -636,6 +650,93 @@ public:
             touchButton2Y = text.toUInt();
             ts->update();
             settings.setValue("touchButton2Y", text);
+        });
+
+        connect(invertYCheckbox, &QCheckBox::stateChanged, this,
+                [](int state)
+        {
+            switch(state)
+            {
+                case Qt::Unchecked:
+                    yAxisMultiplier = 1;
+                    settings.setValue("invertY", false);
+                    break;
+                case Qt::Checked:
+                    yAxisMultiplier = -1;
+                    settings.setValue("invertY", true);
+                    break;
+                default: break;
+            }
+        });
+
+        connect(invertYCppCheckbox, &QCheckBox::stateChanged, this,
+                [](int state)
+        {
+            switch(state)
+            {
+                case Qt::Unchecked:
+                    yAxisMultiplierCpp = 1;
+                    settings.setValue("invertCPPY", false);
+                    break;
+                case Qt::Checked:
+                    yAxisMultiplierCpp = -1;
+                    settings.setValue("invertCPPY", true);
+                    break;
+                default: break;
+            }
+        });
+
+        connect(swapSticksCheckbox, &QCheckBox::stateChanged, this,
+                [](int state)
+        {
+            switch(state)
+            {
+                case Qt::Unchecked:
+                    shouldSwapStick = false;
+                    settings.setValue("swapSticks", false);
+                    break;
+                case Qt::Checked:
+                    shouldSwapStick = true;
+                    settings.setValue("swapSticks", true);
+                    break;
+                default: break;
+            }
+
+        });
+
+        connect(rsSmashCheckbox, &QCheckBox::stateChanged, this,
+                [](int state)
+        {
+             switch(state)
+             {
+                 case Qt::Unchecked:
+                     rightStickSmash = false;
+                     settings.setValue("rightStickSmash", false);
+                     break;
+                 case Qt::Checked:
+                     rightStickSmash = true;
+                     settings.setValue("rightStickSmash", true);
+                     break;
+                 default: break;
+             }
+
+         });
+
+        connect(mhCameraCheckbox, &QCheckBox::stateChanged, this,
+                [](int state)
+        {
+            switch(state)
+            {
+                case Qt::Unchecked:
+                    monsterHunterCamera = false;
+                    settings.setValue("monsterHunterCamera", false);
+                    break;
+                case Qt::Checked:
+                    monsterHunterCamera = true;
+                    settings.setValue("monsterHunterCamera", true);
+                    break;
+                default: break;
+            }
         });
 
         connect(saveButton, &QPushButton::pressed, this,
@@ -711,6 +812,12 @@ public:
         {
            this->hide();
         });
+
+        invertYCheckbox->setChecked(settings.value("invertY", false).toBool());
+        invertYCppCheckbox->setChecked(settings.value("invertCPPY", false).toBool());
+        swapSticksCheckbox->setChecked(settings.value("swapSticks", false).toBool());
+        mhCameraCheckbox->setChecked(settings.value("monsterHunterCamera", false).toBool());
+        rsSmashCheckbox->setChecked(settings.value("rightStickSmash", false).toBool());
     }
 };
 
@@ -719,7 +826,6 @@ class Widget : public QWidget
 private:
     QVBoxLayout *layout;
     QFormLayout *formLayout;
-    QCheckBox *invertYCheckbox, *invertYCppCheckbox, *swapSticksCheckbox, *mhCameraCheckbox, *rsSmashCheckbox;
     QPushButton *homeButton, *powerButton, *longPowerButton, *remapConfigButton;
     QLineEdit *addrLineEdit, *touchScreenScaleEdit;
     QSlider *touchOpacitySlider;
@@ -736,19 +842,8 @@ public:
         touchScreenScaleEdit = new QLineEdit(this);
         touchScreenScaleEdit->setText("1");
 
-        invertYCheckbox = new QCheckBox(this);
-        invertYCppCheckbox = new QCheckBox(this);
-        swapSticksCheckbox = new QCheckBox(this);
-        mhCameraCheckbox = new QCheckBox(this);
-        rsSmashCheckbox = new QCheckBox(this);
-
         formLayout = new QFormLayout;
         formLayout->addRow(tr("IP &address"), addrLineEdit);
-        formLayout->addRow(tr("&Invert Y axis"), invertYCheckbox);
-        formLayout->addRow(tr("&Invert Cpp Y axis"), invertYCppCheckbox);
-        formLayout->addRow(tr("&Swap Analog Sticks"), swapSticksCheckbox);
-        formLayout->addRow(tr("RightStick &DPad"), mhCameraCheckbox);
-        formLayout->addRow(tr("RightStick &Smash"), rsSmashCheckbox);
         formLayout->addRow(tr("Touch Screen &Scale"), touchScreenScaleEdit);
 
         touchOpacitySlider = new QSlider(Qt::Horizontal);
@@ -783,91 +878,6 @@ public:
             touchScreen->setFixedSize(TOUCH_SCREEN_WIDTH*touchScreenScale,
                                       TOUCH_SCREEN_HEIGHT*touchScreenScale);
             touchScreen->update();
-        });
-
-        connect(invertYCheckbox, &QCheckBox::stateChanged, this,
-                [](int state)
-        {
-            switch(state)
-            {
-                case Qt::Unchecked:
-                    yAxisMultiplier = 1;
-                    settings.setValue("invertY", false);
-                    break;
-                case Qt::Checked:
-                    yAxisMultiplier = -1;
-                    settings.setValue("invertY", true);
-                    break;
-                default: break;
-            }
-        });
-
-        connect(mhCameraCheckbox, &QCheckBox::stateChanged, this,
-                [](int state)
-        {
-            switch(state)
-            {
-                case Qt::Unchecked:
-                    monsterHunterCamera = false;
-                    settings.setValue("monsterHunterCamera", false);
-                    break;
-                case Qt::Checked:
-                    monsterHunterCamera = true;
-                    settings.setValue("monsterHunterCamera", true);
-                    break;
-                default: break;
-            }
-        });
-
-        connect(invertYCppCheckbox, &QCheckBox::stateChanged, this,
-                [](int state)
-        {
-            switch(state)
-            {
-                case Qt::Unchecked:
-                    yAxisMultiplierCpp = 1;
-                    settings.setValue("invertY", false);
-                    break;
-                case Qt::Checked:
-                    yAxisMultiplierCpp = -1;
-                    settings.setValue("invertY", true);
-                    break;
-                default: break;
-            }
-        });
-
-        connect(rsSmashCheckbox, &QCheckBox::stateChanged, this,
-                [](int state)
-        {
-             switch(state)
-             {
-                 case Qt::Unchecked:
-                     rightStickSmash = false;
-                     settings.setValue("rightStickSmash", false);
-                     break;
-                 case Qt::Checked:
-                     rightStickSmash = true;
-                     settings.setValue("rightStickSmash", true);
-                     break;
-                 default: break;
-             }
-
-         });
-
-        connect(swapSticksCheckbox, &QCheckBox::stateChanged, this,
-                [](int state)
-        {
-            switch(state)
-            {
-                case Qt::Unchecked:
-                    shouldSwapStick = false;
-                    break;
-                case Qt::Checked:
-                    shouldSwapStick = true;
-                    break;
-                default: break;
-            }
-
         });
 
         connect(homeButton, &QPushButton::pressed, this,
@@ -931,9 +941,6 @@ public:
         this->setWindowTitle(tr("InputRedirectionClient-Qt"));
 
         addrLineEdit->setText(settings.value("ipAddress", "").toString());
-        invertYCheckbox->setChecked(settings.value("invertY", false).toBool());
-        mhCameraCheckbox->setChecked(settings.value("monsterHunterCamera", false).toBool());
-        rsSmashCheckbox->setChecked(settings.value("rightStickSmash", false).toBool());
     }
 
     void show(void)
