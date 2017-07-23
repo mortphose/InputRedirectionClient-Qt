@@ -21,7 +21,7 @@
 #include <QSettings>
 #include <QComboBox>
 #include <QPainter>
-
+#include <QSlider>
 #include <algorithm>
 #include <cmath>
 
@@ -51,6 +51,7 @@ bool isSmashingH = false;
 
 bool touchScreenPressed;
 QPoint touchScreenPosition;
+int touchScreenScale = 1;
 
 QSettings settings("TuxSH", "InputRedirectionClient-Qt");
 
@@ -192,8 +193,10 @@ void sendFrame(void)
 
     if(touchScreenPressed)
     {
-        u32 x = (u32)(0xfff * std::min(std::max(0, touchScreenPosition.x()), TOUCH_SCREEN_WIDTH)) / TOUCH_SCREEN_WIDTH;
-        u32 y = (u32)(0xfff * std::min(std::max(0, touchScreenPosition.y()), TOUCH_SCREEN_HEIGHT)) / TOUCH_SCREEN_HEIGHT;
+        u32 x = (u32)(0xfff * std::min(std::max(0, touchScreenPosition.x()/touchScreenScale),
+                                       TOUCH_SCREEN_WIDTH)) / TOUCH_SCREEN_WIDTH;
+        u32 y = (u32)(0xfff * std::min(std::max(0, touchScreenPosition.y()/touchScreenScale),
+                                       TOUCH_SCREEN_HEIGHT)) / TOUCH_SCREEN_HEIGHT;
         touchScreenState = (1 << 24) | (y << 12) | x;
     }
 
@@ -675,9 +678,10 @@ class Widget : public QWidget
 private:
     QVBoxLayout *layout;
     QFormLayout *formLayout;
-    QLineEdit *addrLineEdit;
     QCheckBox *invertYCheckbox, *invertABCheckbox, *invertXYCheckbox, *mhCameraCheckbox, *rsSmashCheckbox;
     QPushButton *homeButton, *powerButton, *longPowerButton, *remapConfigButton;
+    QLineEdit *addrLineEdit, *touchScreenScaleEdit;
+    QSlider *touchOpacitySlider;
     TouchScreen *touchScreen;
     RemapConfig *remapConfig;
 public:
@@ -687,6 +691,9 @@ public:
 
         addrLineEdit = new QLineEdit(this);
         addrLineEdit->setClearButtonEnabled(true);
+
+        touchScreenScaleEdit = new QLineEdit(this);
+        touchScreenScaleEdit->setText("1");
 
         invertYCheckbox = new QCheckBox(this);
         invertABCheckbox = new QCheckBox(this);
@@ -701,11 +708,18 @@ public:
         formLayout->addRow(tr("Invert X<->&Y"), invertXYCheckbox);
         formLayout->addRow(tr("RightStick &DPad"), mhCameraCheckbox);
         formLayout->addRow(tr("RightStick &Smash"), rsSmashCheckbox);
-        remapConfigButton = new QPushButton(tr("BUTTON &CONFIG"), this);
+        formLayout->addRow(tr("Touch Screen &Scale"), touchScreenScaleEdit);
+
+        touchOpacitySlider = new QSlider(Qt::Horizontal);
+        touchOpacitySlider->setRange(1, 10);
+        touchOpacitySlider->setValue(10);
+        touchOpacitySlider->setTickInterval(1);
+        formLayout->addRow(tr("TS &Opacity"), touchOpacitySlider);
 
         homeButton = new QPushButton(tr("&HOME"), this);
         powerButton = new QPushButton(tr("&POWER"), this);
         longPowerButton = new QPushButton(tr("POWER (&long)"), this);
+        remapConfigButton = new QPushButton(tr("BUTTON &CONFIG"), this);
 
         layout->addLayout(formLayout);
         layout->addWidget(homeButton);
@@ -718,6 +732,16 @@ public:
         {
             ipAddress = text;
             settings.setValue("ipAddress", text);
+        });
+
+        connect(touchScreenScaleEdit, &QLineEdit::textChanged, this,
+                [this](const QString &text)
+        {
+            touchScreenScale = text.toInt();
+            touchScreenScale = touchScreenScale > 1 ? touchScreenScale : 1;
+            touchScreen->setFixedSize(TOUCH_SCREEN_WIDTH*touchScreenScale,
+                                      TOUCH_SCREEN_HEIGHT*touchScreenScale);
+            touchScreen->update();
         });
 
         connect(invertYCheckbox, &QCheckBox::stateChanged, this,
@@ -853,8 +877,16 @@ public:
            remapConfig->show();
         });
 
+        connect(touchOpacitySlider, &QSlider::valueChanged, this,
+                [this](int value)
+        {
+            touchScreen->setWindowOpacity(value / 10.0);
+            touchScreen->update();
+        });
+
         touchScreen = new TouchScreen(nullptr);
         remapConfig = new RemapConfig(nullptr, touchScreen);
+
         this->setWindowTitle(tr("InputRedirectionClient-Qt"));
 
         addrLineEdit->setText(settings.value("ipAddress", "").toString());
@@ -889,7 +921,6 @@ public:
         delete touchScreen;
         delete remapConfig;
     }
-
 };
 
 
