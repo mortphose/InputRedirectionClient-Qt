@@ -8,6 +8,7 @@
 #include <QGamepad>
 #include <QtEndian>
 #include <QUdpSocket>
+#include <QTimer>
 #include <QFormLayout>
 #include <QVBoxLayout>
 #include <QLineEdit>
@@ -482,6 +483,17 @@ struct TouchScreen : public QDialog {
                                        settings.value("touchButton2Y", 0).toInt()*touchScreenScale),
                                         3*touchScreenScale, 3*touchScreenScale);
         }
+    }
+};
+
+struct FrameTimer : public QTimer {
+    FrameTimer(QObject *parent = nullptr) : QTimer(parent)
+    {
+        connect(this, &QTimer::timeout, this,
+                [](void)
+        {
+            sendFrame();
+        });
     }
 };
 
@@ -974,6 +986,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     Widget w;
     GamepadMonitor m(&w);
+    FrameTimer t(&w);
+    t.start(50);
     w.show();
 
     return a.exec();
