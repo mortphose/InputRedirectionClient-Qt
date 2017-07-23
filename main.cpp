@@ -37,6 +37,7 @@ typedef uint8_t u8;
 
 double lx = 0.0, ly = 0.0;
 double rx = 0.0, ry = 0.0;
+double previousLX=lx, previousLY=ly;
 QGamepadManager::GamepadButtons buttons = 0;
 u32 interfaceButtons = 0;
 QString ipAddress;
@@ -45,6 +46,8 @@ bool abInverse = false;
 bool xyInverse = false;
 bool monsterHunterCamera = false;
 bool rightStickSmash = false;
+bool isSmashingV = false;
+bool isSmashingH = false;
 
 bool touchScreenPressed;
 QPoint touchScreenPosition;
@@ -277,9 +280,11 @@ struct GamepadMonitor : public QObject {
             {
                 case QGamepadManager::AxisLeftX:
                     lx = value;
+                    previousLX = lx;
                     break;
                 case QGamepadManager::AxisLeftY:
                     ly = yAxisMultiplier * -value; // for some reason qt inverts this
+                    previousLY = ly;
                     break;
 
                 case QGamepadManager::AxisRightX:
@@ -300,14 +305,22 @@ struct GamepadMonitor : public QObject {
                     {
                         if (value > -1.2 && value < -0.5) // RS tilted left
                         {
+                            isSmashingH = true;
                             buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsAB[0]); // press A
                             lx = -1.2;
                         } else if (value > 0.5 && value < 1.2) // RS tilted right
                         {
+                            isSmashingH = true;
                             buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsAB[0]); // press A
                             lx = 1.2;
                         } else { // RS neutral, release buttons
-                            buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsAB[0])); // Release A
+                            if (isSmashingH)
+                            {
+                                if (!isSmashingV)
+                                    buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsAB[0])); // Release A
+                                lx = previousLX;
+                                isSmashingH = false;
+                            }
                         }
                     }
                     break;
@@ -327,16 +340,24 @@ struct GamepadMonitor : public QObject {
                         }
                     } else if (rightStickSmash)
                     {
-                        if (value > -1.2 && value < -0.5) // RS tilted down
+                        if (ry > -1.2 && ry < -0.5) // RS tilted down
                         {
+                            isSmashingV = true;
                             buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsAB[0]); // press A
                             ly = -1.2;
-                        } else if (value > 0.5 && value < 1.2) // RS tilted up
+                        } else if (ry > 0.5 && ry < 1.2) // RS tilted up
                         {
+                            isSmashingV = true;
                             buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsAB[0]); // press A
                             ly = 1.2;
                         } else { // RS neutral, release button A
-                            buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsAB[0])); // Release A
+                            if (isSmashingV)
+                            {
+                                if (!isSmashingH)
+                                    buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsAB[0])); // Release A
+                                ly = previousLY;
+                                isSmashingV = false;
+                            }
                         }
                     }
                     break;
