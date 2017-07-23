@@ -4,24 +4,26 @@
 
 #include <QWidget>
 #include <QApplication>
-#include <QDebug>
 #include <QGamepadManager>
 #include <QGamepad>
 #include <QtEndian>
 #include <QUdpSocket>
-#include <QTimer>
 #include <QFormLayout>
 #include <QVBoxLayout>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QCheckBox>
 #include <QDialog>
+#include <QSettings>
 #include <QMouseEvent>
 #include <QCloseEvent>
 #include <QSettings>
 #include <QComboBox>
 #include <QPainter>
 #include <QSlider>
+#include <QFileDialog>
+#include <QLabel>
+#include <QMessageBox>
 #include <algorithm>
 #include <cmath>
 
@@ -42,8 +44,6 @@ QGamepadManager::GamepadButtons buttons = 0;
 u32 interfaceButtons = 0;
 QString ipAddress;
 int yAxisMultiplier = 1;
-bool abInverse = false;
-bool xyInverse = false;
 bool monsterHunterCamera = false;
 bool rightStickSmash = false;
 bool isSmashingV = false;
@@ -101,30 +101,13 @@ QGamepadManager::GamepadButton irButtons[] = {
     variantToButton(settings.value("ButtonZL", QGamepadManager::ButtonL2)),
 };
 
-/*QGamepadManager::GamepadButton speButtons[] = {
-    QGamepadManager::ButtonL3,
-    QGamepadManager::ButtonR3,
-    QGamepadManager::ButtonGuide,
-};*/
-
 void sendFrame(void)
 {
     u32 hidPad = 0xfff;
-    if(!abInverse)
+    for(u32 i = 0; i < 2; i++)
     {
-        for(u32 i = 0; i < 2; i++)
-        {
-            if(buttons & (1 << hidButtonsAB[i]))
+         if(buttons & (1 << hidButtonsAB[i]))
                 hidPad &= ~(1 << i);
-        }
-    }
-    else
-    {
-        for(u32 i = 0; i < 2; i++)
-        {
-            if(buttons & (1 << hidButtonsAB[1-i]))
-                hidPad &= ~(1 << i);
-        }
     }
 
     for(u32 i = 2; i < 10; i++)
@@ -133,22 +116,11 @@ void sendFrame(void)
             hidPad &= ~(1 << i);
     }
 
-    if(!xyInverse)
-    {
-        for(u32 i = 10; i < 12; i++)
-        {
+    for(u32 i = 10; i < 12; i++)
+   {
             if(buttons & (1 << hidButtonsXY[i-10]))
                 hidPad &= ~(1 << i);
-        }
-    }
-    else
-    {
-        for(u32 i = 10; i < 12; i++)
-        {
-            if(buttons & (1 << hidButtonsXY[1-(i-10)]))
-                hidPad &= ~(1 << i);
-        }
-    }
+   }
 
     u32 irButtonsState = 0;
     for(u32 i = 0; i < 2; i++)
@@ -156,15 +128,6 @@ void sendFrame(void)
             if(buttons & (1 << irButtons[i]))
                 irButtonsState |= 1 << (i + 1);
     }
-
-    /*u32 specialButtonsState = 0;
-    for(u32 i = 0; i < 3; i++)
-    {
-
-        if(buttons & (1 << speButtons[i]))
-            specialButtonsState |= 1 << i;
-    }
-    specialButtonsState |= interfaceButtons;*/
 
     u32 touchScreenState = 0x2000000;
     u32 circlePadState = 0x7ff7ff;
@@ -207,6 +170,7 @@ void sendFrame(void)
     qToLittleEndian(cppState, (uchar *)ba.data() + 12);
     qToLittleEndian(interfaceButtons, (uchar *)ba.data() + 16);
     QUdpSocket().writeDatagram(ba, QHostAddress(ipAddress), 4950);
+
 }
 
 struct GamepadMonitor : public QObject {
@@ -372,11 +336,24 @@ struct GamepadMonitor : public QObject {
 };
 
 struct TouchScreen : public QDialog {
+private:
+    QLabel *bgLabel;
+public:
     TouchScreen(QWidget *parent = nullptr) : QDialog(parent)
     {
         this->setFixedSize(TOUCH_SCREEN_WIDTH, TOUCH_SCREEN_HEIGHT);
         this->setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint);
         this->setWindowTitle(tr("InputRedirectionClient-Qt - Touch screen"));
+
+        QString curPath = qApp->QCoreApplication::applicationDirPath()+"/Touchscreen.jpg";
+        QPixmap bkgnd(curPath);
+
+        bgLabel = new QLabel(this);
+        bgLabel->setFixedHeight(TOUCH_SCREEN_HEIGHT);
+        bgLabel->setFixedWidth(TOUCH_SCREEN_WIDTH);
+        bgLabel->setPixmap(bkgnd);
+        bgLabel->setScaledContents(true);
+        bgLabel->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
     }
 
     void mousePressEvent(QMouseEvent *ev)
@@ -386,6 +363,20 @@ struct TouchScreen : public QDialog {
             touchScreenPressed = true;
             touchScreenPosition = ev->pos();
             sendFrame();
+        }
+
+        if(ev->button() == Qt::RightButton)
+        {
+
+           QString strPic = QFileDialog::getOpenFileName(this,
+                          tr("Open Touchscreen Image (320x240)"), "MyDocuments",
+                          tr("Image Files (*.jpg *.jpeg *.png *.bmp *.gif *.pbm *.pgm *.ppm *.xbm *.xpm)"));
+
+            if(!strPic.isNull())
+            {
+               QPixmap newPic(strPic);
+               bgLabel->setPixmap(newPic);
+            }
         }
     }
 
@@ -430,17 +421,6 @@ struct TouchScreen : public QDialog {
             painter.setPen(pen);
             painter.drawEllipse(QPoint(settings.value("touchButton2X", 0).toInt(), settings.value("touchButton2Y", 0).toInt()), 3, 3);
         }
-    }
-};
-
-struct FrameTimer : public QTimer {
-    FrameTimer(QObject *parent = nullptr) : QTimer(parent)
-    {
-        connect(this, &QTimer::timeout, this,
-                [](void)
-        {
-            sendFrame();
-        });
     }
 };
 
@@ -678,7 +658,7 @@ class Widget : public QWidget
 private:
     QVBoxLayout *layout;
     QFormLayout *formLayout;
-    QCheckBox *invertYCheckbox, *invertABCheckbox, *invertXYCheckbox, *mhCameraCheckbox, *rsSmashCheckbox;
+    QCheckBox *invertYCheckbox, *mhCameraCheckbox, *rsSmashCheckbox;
     QPushButton *homeButton, *powerButton, *longPowerButton, *remapConfigButton;
     QLineEdit *addrLineEdit, *touchScreenScaleEdit;
     QSlider *touchOpacitySlider;
@@ -696,16 +676,13 @@ public:
         touchScreenScaleEdit->setText("1");
 
         invertYCheckbox = new QCheckBox(this);
-        invertABCheckbox = new QCheckBox(this);
-        invertXYCheckbox = new QCheckBox(this);
         mhCameraCheckbox = new QCheckBox(this);
         rsSmashCheckbox = new QCheckBox(this);
+
         formLayout = new QFormLayout;
 
         formLayout->addRow(tr("IP &address"), addrLineEdit);
         formLayout->addRow(tr("&Invert Y axis"), invertYCheckbox);
-        formLayout->addRow(tr("Invert A<->&B"), invertABCheckbox);
-        formLayout->addRow(tr("Invert X<->&Y"), invertXYCheckbox);
         formLayout->addRow(tr("RightStick &DPad"), mhCameraCheckbox);
         formLayout->addRow(tr("RightStick &Smash"), rsSmashCheckbox);
         formLayout->addRow(tr("Touch Screen &Scale"), touchScreenScaleEdit);
@@ -756,40 +733,6 @@ public:
                 case Qt::Checked:
                     yAxisMultiplier = -1;
                     settings.setValue("invertY", true);
-                    break;
-                default: break;
-            }
-        });
-
-        connect(invertABCheckbox, &QCheckBox::stateChanged, this,
-                [](int state)
-        {
-            switch(state)
-            {
-                case Qt::Unchecked:
-                    abInverse = false;
-                    settings.setValue("invertAB", false);
-                    break;
-                case Qt::Checked:
-                    abInverse = true;
-                    settings.setValue("invertAB", true);
-                    break;
-                default: break;
-            }
-        });
-
-        connect(invertXYCheckbox, &QCheckBox::stateChanged, this,
-                [](int state)
-        {
-            switch(state)
-            {
-                case Qt::Unchecked:
-                    xyInverse = false;
-                    settings.setValue("invertXY", false);
-                    break;
-                case Qt::Checked:
-                    xyInverse = true;
-                    settings.setValue("invertXY", true);
                     break;
                 default: break;
             }
@@ -891,10 +834,9 @@ public:
 
         addrLineEdit->setText(settings.value("ipAddress", "").toString());
         invertYCheckbox->setChecked(settings.value("invertY", false).toBool());
-        invertABCheckbox->setChecked(settings.value("invertAB", false).toBool());
-        invertXYCheckbox->setChecked(settings.value("invertXY", false).toBool());
         mhCameraCheckbox->setChecked(settings.value("monsterHunterCamera", false).toBool());
         rsSmashCheckbox->setChecked(settings.value("rightStickSmash", false).toBool());
+
     }
 
     void show(void)
@@ -923,15 +865,11 @@ public:
     }
 };
 
-
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     Widget w;
     GamepadMonitor m(&w);
-    FrameTimer t(&w);
-    TouchScreen ts;
-    t.start(50);
     w.show();
 
     return a.exec();
