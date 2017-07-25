@@ -22,9 +22,9 @@
 #include <QComboBox>
 #include <QPainter>
 #include <QSlider>
-//#include <QFileDialog>
-//#include <QLabel>
-//#include <QMessageBox>
+#include <QFileDialog>
+#include <QLabel>
+#include <QMessageBox>
 #include <algorithm>
 #include <cmath>
 
@@ -56,6 +56,8 @@ QPoint touchScreenPosition;
 int touchScreenScale = 1;
 
 bool shouldSwapStick = false;
+
+bool timerConnected = false;
 
 QSettings settings("TuxSH", "InputRedirectionClient-Qt");
 
@@ -370,50 +372,79 @@ struct GamepadMonitor : public QObject {
 };
 
 struct TouchScreen : public QDialog {
-//private:
-//    QLabel *bgLabel;
-//public:
+private:
+    QLabel *bgLabel;
+public:
     TouchScreen(QWidget *parent = nullptr) : QDialog(parent)
     {
         this->setFixedSize(TOUCH_SCREEN_WIDTH, TOUCH_SCREEN_HEIGHT);
         this->setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint);
         this->setWindowTitle(tr("InputRedirectionClient-Qt - Touch screen"));
 
-//        QString curPath = qApp->QCoreApplication::applicationDirPath()+"/Touchscreen.jpg";
-//        QPixmap bkgnd(curPath);
-//
-//        bgLabel = new QLabel(this);
-//        bgLabel->setFixedHeight(TOUCH_SCREEN_HEIGHT);
-//        bgLabel->setFixedWidth(TOUCH_SCREEN_WIDTH);
-//        bgLabel->setPixmap(bkgnd);
-//        bgLabel->setScaledContents(true);
-//        bgLabel->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+        QString curPath = qApp->QCoreApplication::applicationDirPath()+"/Touchscreen.jpg";
+        QPixmap background = QPixmap(curPath);
+
+        if (background.isNull())
+        {
+            background = QPixmap(TOUCH_SCREEN_WIDTH, TOUCH_SCREEN_HEIGHT);
+            background.fill(Qt::transparent);
+        }
+
+        QPainter painter(&background);
+        QPen pen;
+        pen.setWidth(2*touchScreenScale);
+
+        if (touchButton1 != QGamepadManager::ButtonInvalid)
+        {
+            pen.setColor(Qt::red);
+            painter.setPen(pen);
+
+            painter.drawEllipse(QPoint(touchButton1X*touchScreenScale,
+                                       touchButton1Y*touchScreenScale),
+                                        3*touchScreenScale, 3*touchScreenScale);
+        }
+        if (touchButton2 != QGamepadManager::ButtonInvalid)
+        {
+            pen.setColor(Qt::blue);
+            painter.setPen(pen);
+
+            painter.drawEllipse(QPoint(touchButton2X*touchScreenScale,
+                                       touchButton2Y*touchScreenScale),
+                                        3*touchScreenScale, 3*touchScreenScale);
+        }
+
+        bgLabel = new QLabel(this);
+        bgLabel->setFixedHeight(TOUCH_SCREEN_HEIGHT);
+        bgLabel->setFixedWidth(TOUCH_SCREEN_WIDTH);
+        bgLabel->setPixmap(background);
+        bgLabel->setScaledContents(true);
+        bgLabel->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
     }
 
-//    void resizeEvent(QResizeEvent* e)
-//    {
-//
-//        QSize newWinSize = e->size();
-//        QSize curWinSize = e->oldSize();
-//        QSize propWinSize = e->size();
-//
-//        if(curWinSize.height() != newWinSize.height())
-//        {
-//            propWinSize.setWidth((TOUCH_SCREEN_WIDTH*newWinSize.height())/TOUCH_SCREEN_HEIGHT);
-//           propWinSize.setHeight(newWinSize.height());
-//        }
-//
-//        if(curWinSize.width() != newWinSize.width())
-//        {
-//            propWinSize.setWidth(newWinSize.width());
-//           propWinSize.setHeight((TOUCH_SCREEN_HEIGHT*newWinSize.width())/TOUCH_SCREEN_WIDTH);
-//        }
-//
-//        touchScreenSize = propWinSize;
-//        this->resize(propWinSize);
-//        bgLabel->setFixedHeight(this->height());
-//        bgLabel->setFixedWidth(this->width());
-//    }
+    void resizeEvent(QResizeEvent* e)
+    {
+
+        QSize newWinSize = e->size();
+        QSize curWinSize = e->oldSize();
+        QSize propWinSize = e->size();
+
+        if(curWinSize.height() != newWinSize.height())
+        {
+           propWinSize.setWidth((TOUCH_SCREEN_WIDTH*newWinSize.height())/TOUCH_SCREEN_HEIGHT);
+           propWinSize.setHeight(newWinSize.height());
+        }
+
+        if(curWinSize.width() != newWinSize.width())
+        {
+           propWinSize.setWidth(newWinSize.width());
+           propWinSize.setHeight((TOUCH_SCREEN_HEIGHT*newWinSize.width())/TOUCH_SCREEN_WIDTH);
+        }
+
+        touchScreenSize = propWinSize;
+        this->resize(propWinSize);
+        bgLabel->setFixedHeight(this->height());
+        bgLabel->setFixedWidth(this->width());
+    }
 
     void mousePressEvent(QMouseEvent *ev)
     {
@@ -423,19 +454,43 @@ struct TouchScreen : public QDialog {
             touchScreenPosition = ev->pos();
             sendFrame();
         }
-//        if(ev->button() == Qt::RightButton)
-//        {
-//
-//           QString strPic = QFileDialog::getOpenFileName(this,
-//                          tr("Open Touchscreen Image (320x240)"), "MyDocuments",
-//                          tr("Image Files (*.jpg *.jpeg *.png *.bmp *.gif *.pbm *.pgm *.ppm *.xbm *.xpm)"));
-//
-//            if(!strPic.isNull())
-//            {
-//               QPixmap newPic(strPic);
-//               bgLabel->setPixmap(newPic);
-//            }
-//        }
+        if(ev->button() == Qt::RightButton)
+        {
+
+           QString strPic = QFileDialog::getOpenFileName(this,
+                          tr("Open Touchscreen Image (320x240)"), "MyDocuments",
+                          tr("Image Files (*.jpg *.jpeg *.png *.bmp *.gif *.pbm *.pgm *.ppm *.xbm *.xpm)"));
+
+            if(!strPic.isNull())
+            {
+               QPixmap newPic(strPic);
+
+               QPainter painter(&newPic);
+               QPen pen;
+               pen.setWidth(2*touchScreenScale);
+
+               if (touchButton1 != QGamepadManager::ButtonInvalid)
+               {
+                   pen.setColor(Qt::red);
+                   painter.setPen(pen);
+
+                   painter.drawEllipse(QPoint(touchButton1X*touchScreenScale,
+                                              touchButton1Y*touchScreenScale),
+                                               3*touchScreenScale, 3*touchScreenScale);
+               }
+               if (touchButton2 != QGamepadManager::ButtonInvalid)
+               {
+                   pen.setColor(Qt::blue);
+                   painter.setPen(pen);
+
+                   painter.drawEllipse(QPoint(touchButton2X*touchScreenScale,
+                                              touchButton2Y*touchScreenScale),
+                                               3*touchScreenScale, 3*touchScreenScale);
+               }
+
+               bgLabel->setPixmap(newPic);
+            }
+        }
     }
 
     void mouseMoveEvent(QMouseEvent *ev)
@@ -462,28 +517,6 @@ struct TouchScreen : public QDialog {
         sendFrame();
         ev->accept();
     }
-
-    void paintEvent(QPaintEvent *)
-    {
-        QPainter painter(this);
-
-        if (settings.value("ButtonT1", QGamepadManager::ButtonInvalid) != QGamepadManager::ButtonInvalid)
-        {
-            QPen pen(QColor("#f00"));
-            painter.setPen(pen);
-            painter.drawEllipse(QPoint(settings.value("touchButton1X", 0).toInt()*touchScreenScale,
-                                       settings.value("touchButton1Y", 0).toInt()*touchScreenScale),
-                                        3*touchScreenScale, 3*touchScreenScale);
-        }
-        if (settings.value("ButtonT2", QGamepadManager::ButtonInvalid) != QGamepadManager::ButtonInvalid)
-        {
-            QPen pen(QColor("#00f"));
-            painter.setPen(pen);
-            painter.drawEllipse(QPoint(settings.value("touchButton2X", 0).toInt()*touchScreenScale,
-                                       settings.value("touchButton2Y", 0).toInt()*touchScreenScale),
-                                        3*touchScreenScale, 3*touchScreenScale);
-        }
-    }
 };
 
 struct FrameTimer : public QTimer {
@@ -492,6 +525,7 @@ struct FrameTimer : public QTimer {
         connect(this, &QTimer::timeout, this,
                 [](void)
         {
+            if (timerConnected)
             sendFrame();
         });
     }
@@ -838,7 +872,8 @@ class Widget : public QWidget
 private:
     QVBoxLayout *layout;
     QFormLayout *formLayout;
-    QPushButton *homeButton, *powerButton, *longPowerButton, *remapConfigButton;
+    QPushButton *homeButton, *powerButton, *longPowerButton, *remapConfigButton,
+        *connectButton;
     QLineEdit *addrLineEdit, *touchScreenScaleEdit;
     QSlider *touchOpacitySlider;
     TouchScreen *touchScreen;
@@ -850,12 +885,14 @@ public:
 
         addrLineEdit = new QLineEdit(this);
         addrLineEdit->setClearButtonEnabled(true);
+        connectButton = new QPushButton(tr("&CONNECT"), this);
 
         touchScreenScaleEdit = new QLineEdit(this);
         touchScreenScaleEdit->setText("1");
 
         formLayout = new QFormLayout;
         formLayout->addRow(tr("IP &address"), addrLineEdit);
+        formLayout->addRow(tr(""), connectButton);
         formLayout->addRow(tr("Touch Screen &Scale"), touchScreenScaleEdit);
 
         touchOpacitySlider = new QSlider(Qt::Horizontal);
@@ -880,6 +917,19 @@ public:
         {
             ipAddress = text;
             settings.setValue("ipAddress", text);
+        });
+
+        connect(connectButton, &QPushButton::released, this,
+                [this](void)
+        {
+            if (!timerConnected)
+            {
+                timerConnected = true;
+                connectButton->setText("DISCONNECT");
+            } else {
+                timerConnected = false;
+                connectButton->setText("CONNECT");
+            }
         });
 
         connect(touchScreenScaleEdit, &QLineEdit::textChanged, this,
