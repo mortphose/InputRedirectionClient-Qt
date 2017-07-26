@@ -23,6 +23,7 @@ public:
     bool isTouchScreenPressed();
     void setTouchScreenPressed(bool b);
     void updatePixmap(void);
+    void clearImage(void);
 };
 
 #endif // TOUCHSCREEN_H

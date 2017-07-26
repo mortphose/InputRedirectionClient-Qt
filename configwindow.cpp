@@ -7,8 +7,6 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     this->setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint);
     this->setWindowTitle(tr("InputRedirectionClient-Qt - Button Config"));
 
-    layout = new QVBoxLayout(this);
-
     comboBoxA = populateItems(variantToButton(settings.value("ButtonA", QGamepadManager::ButtonA)));
     comboBoxB = populateItems(variantToButton(settings.value("ButtonB", QGamepadManager::ButtonB)));
     comboBoxX = populateItems(variantToButton(settings.value("ButtonX", QGamepadManager::ButtonX)));
@@ -28,6 +26,8 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     comboBoxPowerLong = populateItems(variantToButton(settings.value("ButtonPowerLong", QGamepadManager::ButtonInvalid)));
     comboBoxTouch1 = populateItems(variantToButton(settings.value("ButtonT1", QGamepadManager::ButtonInvalid)));
     comboBoxTouch2 = populateItems(variantToButton(settings.value("ButtonT2", QGamepadManager::ButtonInvalid)));
+    comboBoxTouch3 = populateItems(variantToButton(settings.value("ButtonT3", QGamepadManager::ButtonInvalid)));
+    comboBoxTouch4 = populateItems(variantToButton(settings.value("ButtonT4", QGamepadManager::ButtonInvalid)));
 
     touchButton1XEdit = new QLineEdit(this);
     touchButton1XEdit->setClearButtonEnabled(true);
@@ -43,51 +43,109 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     touchButton2YEdit->setClearButtonEnabled(true);
     touchButton2YEdit->setText(settings.value("touchButton2Y", "0").toString());
 
+    touchButton3XEdit = new QLineEdit(this);
+    touchButton3XEdit->setClearButtonEnabled(true);
+    touchButton3XEdit->setText(settings.value("touchButton3X", "0").toString());
+    touchButton3YEdit = new QLineEdit(this);
+    touchButton3YEdit->setClearButtonEnabled(true);
+    touchButton3YEdit->setText(settings.value("touchButton3Y", "0").toString());
+
+    touchButton4XEdit = new QLineEdit(this);
+    touchButton4XEdit->setClearButtonEnabled(true);
+    touchButton4XEdit->setText(settings.value("touchButton4X", "0").toString());
+    touchButton4YEdit = new QLineEdit(this);
+    touchButton4YEdit->setClearButtonEnabled(true);
+    touchButton4YEdit->setText(settings.value("touchButton4Y", "0").toString());
+
     invertYCheckbox = new QCheckBox(this);
     invertYCppCheckbox = new QCheckBox(this);
     swapSticksCheckbox = new QCheckBox(this);
     mhCameraCheckbox = new QCheckBox(this);
     rsSmashCheckbox = new QCheckBox(this);
 
-    formLayout = new QFormLayout;
-
-    formLayout->addRow(tr("A Button"), comboBoxA);
-    formLayout->addRow(tr("B Button"), comboBoxB);
-    formLayout->addRow(tr("X Button"), comboBoxX);
-    formLayout->addRow(tr("Y Button"), comboBoxY);
-    formLayout->addRow(tr("DPad-Up"), comboBoxUp);
-    formLayout->addRow(tr("DPad-Down"), comboBoxDown);
-    formLayout->addRow(tr("DPad-Left"), comboBoxLeft);
-    formLayout->addRow(tr("DPad-Right"), comboBoxRight);
-    formLayout->addRow(tr("L Button"), comboBoxL);
-    formLayout->addRow(tr("R Button"), comboBoxR);
-    formLayout->addRow(tr("Select"), comboBoxSelect);
-    formLayout->addRow(tr("Start"), comboBoxStart);
-    formLayout->addRow(tr("Home"), comboBoxHome);
-    formLayout->addRow(tr("Power"), comboBoxPower);
-    formLayout->addRow(tr("Power-Long"), comboBoxPowerLong);
-    formLayout->addRow(tr("ZL Button"), comboBoxZL);
-    formLayout->addRow(tr("ZR Button"), comboBoxZR);
-
-    formLayout->addRow(tr("Touch Button 1"), comboBoxTouch1);
-    formLayout->addRow(tr("Touch Button X"), touchButton1XEdit);
-    formLayout->addRow(tr("Touch Button Y"), touchButton1YEdit);
-    formLayout->addRow(tr("Touch Button 2"), comboBoxTouch2);
-    formLayout->addRow(tr("Touch Button X"), touchButton2XEdit);
-    formLayout->addRow(tr("Touch Button Y"), touchButton2YEdit);
-
-    formLayout->addRow(tr("&Invert Y axis"), invertYCheckbox);
-    formLayout->addRow(tr("&Invert Cpp Y "), invertYCppCheckbox);
-    formLayout->addRow(tr("&Swap Sticks"), swapSticksCheckbox);
-    formLayout->addRow(tr("RightStick &DPad"), mhCameraCheckbox);
-    formLayout->addRow(tr("RightStick &Smash"), rsSmashCheckbox);
-
     saveButton = new QPushButton(tr("&SAVE"), this);
     closeButton = new QPushButton(tr("&CANCEL"), this);
 
-    layout->addLayout(formLayout);
-    layout->addWidget(saveButton);
-    layout->addWidget(closeButton);
+    layout = new QGridLayout(this);
+
+    layout->addWidget(new QLabel("Y Button"), 0, 0);
+    layout->addWidget(comboBoxY, 0, 1);
+    layout->addWidget(new QLabel("X Button"), 0, 2);
+    layout->addWidget(comboBoxX, 0, 3);
+    layout->addWidget(new QLabel("B Button"), 1, 0);
+    layout->addWidget(comboBoxB, 1, 1);
+    layout->addWidget(new QLabel("A Button"), 1, 2);
+    layout->addWidget(comboBoxA, 1, 3);
+
+    layout->addWidget(new QLabel("DPad-Down"), 2, 0);
+    layout->addWidget(comboBoxDown, 2, 1);
+    layout->addWidget(new QLabel("DPad-Up"), 2, 2);
+    layout->addWidget(comboBoxUp, 2, 3);
+    layout->addWidget(new QLabel("DPad-Left"), 3, 0);
+    layout->addWidget(comboBoxLeft, 3, 1);
+    layout->addWidget(new QLabel("DPad-Right"), 3, 2);
+    layout->addWidget(comboBoxRight, 3, 3);
+
+    layout->addWidget(new QLabel("L Button"), 4, 0);
+    layout->addWidget(comboBoxL, 4, 1);
+    layout->addWidget(new QLabel("R Button"), 4, 2);
+    layout->addWidget(comboBoxR, 4, 3);
+    layout->addWidget(new QLabel("ZL Button"), 5, 0);
+    layout->addWidget(comboBoxZL, 5, 1);
+    layout->addWidget(new QLabel("ZR Button"), 5, 2);
+    layout->addWidget(comboBoxZR, 5, 3);
+
+    layout->addWidget(new QLabel("Select"), 6, 0);
+    layout->addWidget(comboBoxSelect, 6, 1);
+    layout->addWidget(new QLabel("Start"), 6, 2);
+    layout->addWidget(comboBoxStart, 6, 3);
+
+    layout->addWidget(new QLabel("Power Button"), 7, 0);
+    layout->addWidget(comboBoxPower, 7, 1);
+    layout->addWidget(new QLabel("Power-Long"), 7, 2);
+    layout->addWidget(comboBoxPowerLong, 7, 3);
+    layout->addWidget(new QLabel("Home Button"), 8, 0, 1, 2);
+    layout->addWidget(comboBoxHome, 8, 1, 1, 2);
+
+    layout->addWidget(new QLabel("Invert Y axis"), 17, 0);
+    layout->addWidget(invertYCheckbox, 17, 1);
+    layout->addWidget(new QLabel("Invert CPP Y"), 17, 2);
+    layout->addWidget(invertYCppCheckbox, 17, 3);
+    layout->addWidget(new QLabel("Swap CPads"), 18, 2);
+    layout->addWidget(swapSticksCheckbox, 18, 3);
+
+    layout->addWidget(new QLabel("RS as DPad"), 19, 0);
+    layout->addWidget(mhCameraCheckbox, 19, 1);
+    layout->addWidget(new QLabel("RS as Smash"), 19, 2);
+    layout->addWidget(rsSmashCheckbox, 19, 3);
+
+    layout->addWidget(new QLabel("Touch R"), 9, 0, 1, 2);
+    layout->addWidget(comboBoxTouch1, 9, 1, 1, 2);
+    layout->addWidget(new QLabel("X"), 10, 0);
+    layout->addWidget(touchButton1XEdit, 10, 1);
+    layout->addWidget(new QLabel("Y"), 10, 2);
+    layout->addWidget(touchButton1YEdit, 10, 3);
+    layout->addWidget(new QLabel("Touch B"), 11, 0, 1, 2);
+    layout->addWidget(comboBoxTouch2, 11, 1, 1, 2);
+    layout->addWidget(new QLabel("X"), 12, 0);
+    layout->addWidget(touchButton2XEdit, 12, 1);
+    layout->addWidget(new QLabel("Y"), 12, 2);
+    layout->addWidget(touchButton2YEdit, 12, 3);
+    layout->addWidget(new QLabel("Touch G"), 13, 0, 1, 2);
+    layout->addWidget(comboBoxTouch3, 13, 1, 1, 2);
+    layout->addWidget(new QLabel("X"), 14, 0);
+    layout->addWidget(touchButton3XEdit, 14, 1);
+    layout->addWidget(new QLabel("Y"), 14, 2);
+    layout->addWidget(touchButton3YEdit, 14, 3);
+    layout->addWidget(new QLabel("Touch Y"), 15, 0, 1, 2);
+    layout->addWidget(comboBoxTouch4, 15, 1, 1, 2);
+    layout->addWidget(new QLabel("X"), 16, 0);
+    layout->addWidget(touchButton4XEdit, 16, 1);
+    layout->addWidget(new QLabel("Y"), 16, 2);
+    layout->addWidget(touchButton4YEdit, 16, 3);
+
+    layout->addWidget(saveButton, 20, 0, 1, 2);
+    layout->addWidget(closeButton, 20, 2, 1, 2);
 
     connect(touchButton1XEdit, &QLineEdit::textChanged, this,
             [ts](const QString &text)
@@ -112,6 +170,30 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     {
         touchButton2Y = text.toUInt();
         settings.setValue("touchButton2Y", text);
+    });
+    connect(touchButton3XEdit, &QLineEdit::textChanged, this,
+            [ts](const QString &text)
+    {
+        touchButton3X = text.toUInt();
+        settings.setValue("touchButton3X", text);
+    });
+    connect(touchButton3YEdit, &QLineEdit::textChanged, this,
+            [ts](const QString &text)
+    {
+        touchButton3Y = text.toUInt();
+        settings.setValue("touchButton3Y", text);
+    });
+    connect(touchButton4XEdit, &QLineEdit::textChanged, this,
+            [ts](const QString &text)
+    {
+        touchButton4X = text.toUInt();
+        settings.setValue("touchButton4X", text);
+    });
+    connect(touchButton4YEdit, &QLineEdit::textChanged, this,
+            [ts](const QString &text)
+    {
+        touchButton4Y = text.toUInt();
+        settings.setValue("touchButton4Y", text);
     });
 
     connect(invertYCheckbox, &QCheckBox::stateChanged, this,
@@ -266,6 +348,13 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
         QGamepadManager::GamepadButton t2 = variantToButton(currentData(comboBoxTouch2));
         touchButton2 = t2;
         settings.setValue("ButtonT2", t2);
+        QGamepadManager::GamepadButton t3 = variantToButton(currentData(comboBoxTouch3));
+        touchButton3 = t3;
+        settings.setValue("ButtonT3", t3);
+        QGamepadManager::GamepadButton t4 = variantToButton(currentData(comboBoxTouch4));
+        touchButton4 = t4;
+        settings.setValue("ButtonT4", t4);
+
         ts->updatePixmap();
 
     });
@@ -285,20 +374,20 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
 QComboBox* ConfigWindow::populateItems(QGamepadManager::GamepadButton button)
 {
     QComboBox *comboBox = new QComboBox();
-    comboBox->addItem("A (bottom)", QGamepadManager::ButtonA);
-    comboBox->addItem("B (right)", QGamepadManager::ButtonB);
-    comboBox->addItem("X (left)", QGamepadManager::ButtonX);
-    comboBox->addItem("Y (top)", QGamepadManager::ButtonY);
-    comboBox->addItem("Right", QGamepadManager::ButtonRight);
-    comboBox->addItem("Left", QGamepadManager::ButtonLeft);
+    comboBox->addItem("A", QGamepadManager::ButtonA);
+    comboBox->addItem("B", QGamepadManager::ButtonB);
+    comboBox->addItem("X", QGamepadManager::ButtonX);
+    comboBox->addItem("Y", QGamepadManager::ButtonY);
     comboBox->addItem("Up", QGamepadManager::ButtonUp);
     comboBox->addItem("Down", QGamepadManager::ButtonDown);
-    comboBox->addItem("RB", QGamepadManager::ButtonR1);
+    comboBox->addItem("Right", QGamepadManager::ButtonRight);
+    comboBox->addItem("Left", QGamepadManager::ButtonLeft);
     comboBox->addItem("LB", QGamepadManager::ButtonL1);
-    comboBox->addItem("Select", QGamepadManager::ButtonSelect);
-    comboBox->addItem("Start", QGamepadManager::ButtonStart);
-    comboBox->addItem("RT", QGamepadManager::ButtonR2);
+    comboBox->addItem("RB", QGamepadManager::ButtonR1);
     comboBox->addItem("LT", QGamepadManager::ButtonL2);
+    comboBox->addItem("RT", QGamepadManager::ButtonR2);
+    comboBox->addItem("Start", QGamepadManager::ButtonStart);
+    comboBox->addItem("Back", QGamepadManager::ButtonSelect);
     comboBox->addItem("L3", QGamepadManager::ButtonL3);
     comboBox->addItem("R3", QGamepadManager::ButtonR3);
     comboBox->addItem("Guide", QGamepadManager::ButtonGuide);

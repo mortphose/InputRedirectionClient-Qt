@@ -139,6 +139,26 @@ void TouchScreen::updatePixmap(void)
 
         painter.drawEllipse(QPoint(touchButton2X, touchButton2Y), 3, 3);
     }
+    if (touchButton3 != QGamepadManager::ButtonInvalid)
+    {
+        pen.setColor(Qt::green);
+        painter.setPen(pen);
+
+        painter.drawEllipse(QPoint(touchButton3X, touchButton3Y), 3, 3);
+    }
+    if (touchButton4 != QGamepadManager::ButtonInvalid)
+    {
+        pen.setColor(Qt::yellow);
+        painter.setPen(pen);
+
+        painter.drawEllipse(QPoint(touchButton4X, touchButton4Y), 3, 3);
+    }
 
     bgLabel->setPixmap(newPic);
+}
+
+void TouchScreen::clearImage(void)
+{
+    settings.setValue("tsBackgroundImage", "");
+    updatePixmap();
 }

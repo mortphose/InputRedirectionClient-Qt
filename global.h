@@ -63,7 +63,10 @@ extern QGamepadManager::GamepadButton powerLongButton;
 
 extern QGamepadManager::GamepadButton touchButton1;
 extern QGamepadManager::GamepadButton touchButton2;
+extern QGamepadManager::GamepadButton touchButton3;
+extern QGamepadManager::GamepadButton touchButton4;
 extern int touchButton1X, touchButton1Y, touchButton2X, touchButton2Y;
+extern int touchButton3X, touchButton3Y, touchButton4X, touchButton4Y;
 
 extern QGamepadManager::GamepadButton hidButtonsAB[2];
 extern QGamepadManager::GamepadButton hidButtonsMiddle[8];

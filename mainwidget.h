@@ -11,7 +11,7 @@ private:
     QVBoxLayout *layout;
     QFormLayout *formLayout;
     QPushButton *homeButton, *powerButton, *longPowerButton, *remapConfigButton,
-        *connectButton;
+        *enableTimerButton, *clearImageButton;
     QLineEdit *addrLineEdit;
     QSlider *touchOpacitySlider;
     ConfigWindow *remapConfig;
@@ -25,11 +25,11 @@ public:
 
         addrLineEdit = new QLineEdit(this);
         addrLineEdit->setClearButtonEnabled(true);
-        connectButton = new QPushButton(tr("&CONNECT"), this);
+        enableTimerButton = new QPushButton(tr("DISABLED"), this);
 
         formLayout = new QFormLayout;
         formLayout->addRow(tr("IP &address"), addrLineEdit);
-        formLayout->addRow(tr(""), connectButton);
+        formLayout->addRow(tr("Frame &Timer"), enableTimerButton);
 
         touchOpacitySlider = new QSlider(Qt::Horizontal);
         touchOpacitySlider->setRange(1, 10);
@@ -41,12 +41,14 @@ public:
         powerButton = new QPushButton(tr("&POWER"), this);
         longPowerButton = new QPushButton(tr("POWER (&long)"), this);
         remapConfigButton = new QPushButton(tr("BUTTON &CONFIG"), this);
+        clearImageButton = new QPushButton(tr("&CLEAR IMAGE"), this);
 
         layout->addLayout(formLayout);
         layout->addWidget(homeButton);
         layout->addWidget(powerButton);
         layout->addWidget(longPowerButton);
         layout->addWidget(remapConfigButton);
+        layout->addWidget(clearImageButton);
 
         connect(addrLineEdit, &QLineEdit::textChanged, this,
                 [](const QString &text)
@@ -55,16 +57,16 @@ public:
             settings.setValue("ipAddress", text);
         });
 
-        connect(connectButton, &QPushButton::released, this,
+        connect(enableTimerButton, &QPushButton::released, this,
                 [this](void)
         {
             if (!timerEnabled)
             {
                 timerEnabled = true;
-                connectButton->setText("DISCONNECT");
+                enableTimerButton->setText("ENABLED");
             } else {
                 timerEnabled = false;
-                connectButton->setText("CONNECT");
+                enableTimerButton->setText("DISABLED");
             }
         });
 
@@ -113,7 +115,17 @@ public:
         connect(remapConfigButton, &QPushButton::released, this,
                 [this](void)
         {
-           remapConfig->show();
+            if (!remapConfig->isVisible())
+            {
+                remapConfig->move(this->x() - remapConfig->width() - 5,this->y());
+                remapConfig->show();
+            } else remapConfig->hide();
+        });
+
+        connect(clearImageButton, &QPushButton::released, this,
+                [this](void)
+        {
+           touchScreen->clearImage();
         });
 
         connect(touchOpacitySlider, &QSlider::valueChanged, this,
@@ -134,6 +146,7 @@ public:
     void show(void)
     {
         QWidget::show();
+        touchScreen->move(this->x() + this->width() + 5,this->y());
         touchScreen->show();
         remapConfig->hide();
     }
@@ -143,6 +156,11 @@ public:
         touchScreen->close();
         remapConfig->close();
         ev->accept();
+    }
+
+    void moveEvent(QMoveEvent *event)
+    {
+        touchScreen->move(touchScreen->pos() + (event->pos() - event->oldPos()));
     }
 
     virtual ~Widget(void)

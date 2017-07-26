@@ -32,6 +32,16 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
             touchScreenPressed = true;
             touchScreenPosition = QPoint(touchButton2X, touchButton2Y)*tsRatio;
         }
+        if (button == touchButton3)
+        {
+            touchScreenPressed = true;
+            touchScreenPosition = QPoint(touchButton3X, touchButton3Y)*tsRatio;
+        }
+        if (button == touchButton4)
+        {
+            touchScreenPressed = true;
+            touchScreenPosition = QPoint(touchButton4X, touchButton4Y)*tsRatio;
+        }
 
         sendFrame();
     });
@@ -55,7 +65,8 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
             interfaceButtons &= ~4;
         }
 
-        if ((button == touchButton1) || (button == touchButton2))
+        if ((button == touchButton1) || (button == touchButton2)
+                || (button == touchButton3) || (button == touchButton4))
         {
             touchScreenPressed = false;
         }

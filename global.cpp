@@ -29,10 +29,16 @@ QGamepadManager::GamepadButton powerLongButton = variantToButton(settings.value(
 
 QGamepadManager::GamepadButton touchButton1 = variantToButton(settings.value("ButtonT1", QGamepadManager::ButtonInvalid));
 QGamepadManager::GamepadButton touchButton2 = variantToButton(settings.value("ButtonT2", QGamepadManager::ButtonInvalid));
+QGamepadManager::GamepadButton touchButton3 = variantToButton(settings.value("ButtonT3", QGamepadManager::ButtonInvalid));
+QGamepadManager::GamepadButton touchButton4 = variantToButton(settings.value("ButtonT4", QGamepadManager::ButtonInvalid));
 int touchButton1X = settings.value("touchButton1X", 0).toInt();
 int touchButton1Y = settings.value("touchButton1Y", 0).toInt();
 int touchButton2X = settings.value("touchButton2X", 0).toInt();
 int touchButton2Y = settings.value("touchButton2Y", 0).toInt();
+int touchButton3X = settings.value("touchButton3X", 0).toInt();
+int touchButton3Y = settings.value("touchButton3Y", 0).toInt();
+int touchButton4X = settings.value("touchButton4X", 0).toInt();
+int touchButton4Y = settings.value("touchButton4Y", 0).toInt();
 
 QGamepadManager::GamepadButton hidButtonsAB[2]={
 variantToButton(settings.value("ButtonA", QGamepadManager::ButtonA)),

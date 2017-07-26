@@ -8,13 +8,13 @@
 class ConfigWindow : public QDialog
 {
 private:
-    QVBoxLayout *layout;
-    QFormLayout *formLayout;
+    QGridLayout *layout;
     QComboBox *comboBoxA, *comboBoxB, *comboBoxX, *comboBoxY, *comboBoxL, *comboBoxR,
         *comboBoxUp, *comboBoxDown, *comboBoxLeft, *comboBoxRight, *comboBoxStart, *comboBoxSelect,
-        *comboBoxZL, *comboBoxZR, *comboBoxHome, *comboBoxPower, *comboBoxPowerLong, *comboBoxTouch1, *comboBoxTouch2;
-    QLineEdit *touchButton1XEdit, *touchButton1YEdit,
-        *touchButton2XEdit, *touchButton2YEdit;
+        *comboBoxZL, *comboBoxZR, *comboBoxHome, *comboBoxPower, *comboBoxPowerLong,
+        *comboBoxTouch1, *comboBoxTouch2, *comboBoxTouch3, *comboBoxTouch4;
+    QLineEdit *touchButton1XEdit, *touchButton1YEdit, *touchButton3XEdit, *touchButton3YEdit,
+        *touchButton2XEdit, *touchButton2YEdit, *touchButton4XEdit, *touchButton4YEdit;
     QPushButton *saveButton, *closeButton;
     QCheckBox *invertYCheckbox, *invertYCppCheckbox, *swapSticksCheckbox, *mhCameraCheckbox, *rsSmashCheckbox;
 
