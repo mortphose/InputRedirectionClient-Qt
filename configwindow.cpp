@@ -62,6 +62,8 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     swapSticksCheckbox = new QCheckBox(this);
     mhCameraCheckbox = new QCheckBox(this);
     rsSmashCheckbox = new QCheckBox(this);
+    rsFaceButtonsCheckbox = new QCheckBox();
+    disableCStickCheckbox = new QCheckBox();
 
     saveButton = new QPushButton(tr("&SAVE"), this);
     closeButton = new QPushButton(tr("&CANCEL"), this);
@@ -113,11 +115,15 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     layout->addWidget(invertYCppCheckbox, 17, 3);
     layout->addWidget(new QLabel("Swap CPads"), 18, 2);
     layout->addWidget(swapSticksCheckbox, 18, 3);
+    layout->addWidget(new QLabel("Disable C"), 18, 0);
+    layout->addWidget(disableCStickCheckbox, 18, 1);
 
     layout->addWidget(new QLabel("RS as DPad"), 19, 0);
     layout->addWidget(mhCameraCheckbox, 19, 1);
-    layout->addWidget(new QLabel("RS as Smash"), 19, 2);
-    layout->addWidget(rsSmashCheckbox, 19, 3);
+    layout->addWidget(new QLabel("RS as Smash"), 20, 0);
+    layout->addWidget(rsSmashCheckbox, 20, 1);
+    layout->addWidget(new QLabel("RS as ABXY"), 19, 2);
+    layout->addWidget(rsFaceButtonsCheckbox, 19, 3);
 
     layout->addWidget(new QLabel("Touch R"), 9, 0, 1, 2);
     layout->addWidget(comboBoxTouch1, 9, 1, 1, 2);
@@ -144,8 +150,8 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     layout->addWidget(new QLabel("Y"), 16, 2);
     layout->addWidget(touchButton4YEdit, 16, 3);
 
-    layout->addWidget(saveButton, 20, 0, 1, 2);
-    layout->addWidget(closeButton, 20, 2, 1, 2);
+    layout->addWidget(saveButton, 21, 0, 1, 2);
+    layout->addWidget(closeButton, 21, 2, 1, 2);
 
     connect(touchButton1XEdit, &QLineEdit::textChanged, this,
             [ts](const QString &text)
@@ -282,6 +288,38 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
             default: break;
         }
     });
+    connect(disableCStickCheckbox, &QCheckBox::stateChanged, this,
+            [](int state)
+    {
+        switch(state)
+        {
+            case Qt::Unchecked:
+                cStickDisabled = false;
+                settings.setValue("cStickDisable", false);
+                break;
+            case Qt::Checked:
+                cStickDisabled = true;
+                settings.setValue("cStickDisable", true);
+                break;
+            default: break;
+        }
+    });
+    connect(rsFaceButtonsCheckbox, &QCheckBox::stateChanged, this,
+            [](int state)
+    {
+        switch(state)
+        {
+            case Qt::Unchecked:
+                rightStickFaceButtons = false;
+                settings.setValue("rightStickABXY", false);
+                break;
+            case Qt::Checked:
+                rightStickFaceButtons = true;
+                settings.setValue("rightStickABXY", true);
+                break;
+            default: break;
+        }
+    });
 
     connect(saveButton, &QPushButton::pressed, this,
             [this, ts](void)
@@ -369,6 +407,8 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     swapSticksCheckbox->setChecked(settings.value("swapSticks", false).toBool());
     mhCameraCheckbox->setChecked(settings.value("monsterHunterCamera", false).toBool());
     rsSmashCheckbox->setChecked(settings.value("rightStickSmash", false).toBool());
+    disableCStickCheckbox->setChecked(settings.value("cStickDisable", false).toBool());
+    rsFaceButtonsCheckbox->setChecked(settings.value("rightStickABXY", false).toBool());
 }
 
 QComboBox* ConfigWindow::populateItems(QGamepadManager::GamepadButton button)

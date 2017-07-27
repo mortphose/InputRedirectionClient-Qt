@@ -16,7 +16,8 @@ private:
     QLineEdit *touchButton1XEdit, *touchButton1YEdit, *touchButton3XEdit, *touchButton3YEdit,
         *touchButton2XEdit, *touchButton2YEdit, *touchButton4XEdit, *touchButton4YEdit;
     QPushButton *saveButton, *closeButton;
-    QCheckBox *invertYCheckbox, *invertYCppCheckbox, *swapSticksCheckbox, *mhCameraCheckbox, *rsSmashCheckbox;
+    QCheckBox *invertYCheckbox, *invertYCppCheckbox, *swapSticksCheckbox, *mhCameraCheckbox, *rsSmashCheckbox,
+        *disableCStickCheckbox, *rsFaceButtonsCheckbox;
 
     QComboBox* populateItems(QGamepadManager::GamepadButton button);
 

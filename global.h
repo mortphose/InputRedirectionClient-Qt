@@ -44,6 +44,8 @@ extern bool monsterHunterCamera;
 extern bool rightStickSmash;
 extern bool isSmashingV;
 extern bool isSmashingH;
+extern bool rightStickFaceButtons;
+extern bool cStickDisabled;
 
 extern double lx, ly;
 extern double rx, ry;

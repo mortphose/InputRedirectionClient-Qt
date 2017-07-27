@@ -10,6 +10,8 @@ bool monsterHunterCamera = false;
 bool rightStickSmash = false;
 bool isSmashingH = false;
 bool isSmashingV = false;
+bool rightStickFaceButtons = false;
+bool cStickDisabled = false;
 
 double lx = 0.0, ly = 0.0;
 double rx = 0.0, ry = 0.0;
