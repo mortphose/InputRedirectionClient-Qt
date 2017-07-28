@@ -13,7 +13,7 @@ struct FrameTimer : public QTimer {
                 [](void)
         {
             if (timerEnabled)
-            sendFrame();
+                sendFrame();
         });
     }
 };

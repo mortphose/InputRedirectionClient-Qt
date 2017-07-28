@@ -9,7 +9,6 @@
 #include "configwindow.h"
 #include "gpconfigurator.h"
 
-
 class Widget : public QWidget
 {
 private:
@@ -45,9 +44,16 @@ public:
         homeButton = new QPushButton(tr("&HOME"), this);
         powerButton = new QPushButton(tr("&POWER"), this);
         longPowerButton = new QPushButton(tr("POWER (&long)"), this);
-        remapConfigButton = new QPushButton(tr("BUTTON &CONFIG"), this);
-        clearImageButton = new QPushButton(tr("&CLEAR IMAGE"), this);
-        configGamepadButton = new QPushButton(tr("&CONFIGURE GAMEPAD"));
+        remapConfigButton = new QPushButton(tr("&BUTTON CONFIG"), this);
+        clearImageButton = new QPushButton(tr("CLEAR &IMAGE"), this);
+        configGamepadButton = new QPushButton(tr("CONFIGURE &GAMEPAD"));
+
+        // Disable/hide the configurator button if running windows since it's not supported
+        if (QSysInfo::productType() == "windows")
+        {
+            configGamepadButton->setEnabled(false);
+            configGamepadButton->setVisible(false);
+        }
 
         layout->addLayout(formLayout);
         layout->addWidget(homeButton);
@@ -120,7 +126,7 @@ public:
             }
 
                 buttons &= QGamepadManager::GamepadButtons(~(1 << button));
-               // sendFrame();
+              // sendFrame();
 
         });
 
