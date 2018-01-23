@@ -34,7 +34,9 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     txtStickVal->setText(tr("%1").arg(CPAD_BOUND));
 
     txtCppVal->setClearButtonEnabled(true);
+    txtCppVal->setInputMethodHints(Qt::ImhPreferNumbers);
     txtStickVal->setClearButtonEnabled(true);
+    txtStickVal->setInputMethodHints(Qt::ImhPreferNumbers);
 
     invertYCheckbox = new QCheckBox(this);
     invertYCppCheckbox = new QCheckBox(this);
@@ -44,7 +46,7 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     rsFaceButtonsCheckbox = new QCheckBox();
     disableCStickCheckbox = new QCheckBox();
 
-    saveButton = new QPushButton(tr("&SAVE"), this);
+    saveButton = new QPushButton(tr("&SAVE 💾"), this);
 
     layout = new QGridLayout(this);
 
@@ -295,6 +297,12 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
 
         ts->updatePixmap();
 
+    });
+
+    connect(saveButton, &QPushButton::released, this,
+            [this](void)
+    {
+        this->hide();
     });
 
     invertYCheckbox->setChecked(settings.value("invertY", false).toBool());
