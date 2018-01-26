@@ -52,11 +52,16 @@ public:
         //formLayout->addRow(tr("TS Opacity"), touchOpacitySlider);
 
         homeButton = new QPushButton(tr("Home 🏠"), this);
+        homeButton->setFocusPolicy(Qt::NoFocus);
         powerButton = new QPushButton(tr("Power ⚫"), this);
+        powerButton->setFocusPolicy(Qt::NoFocus);
         longPowerButton = new QPushButton(tr("Power (long) ⚫⚫⚫"), this);
+        longPowerButton->setFocusPolicy(Qt::NoFocus);
         settingsConfigButton = new QPushButton(tr("Settings ⚙️"), this);
+        settingsConfigButton->setFocusPolicy(Qt::NoFocus);
         //clearImageButton = new QPushButton(tr("Clear Image"), this);
         configGamepadButton = new QPushButton(tr("Configure Custom Gamepad 🎮"));
+        configGamepadButton->setFocusPolicy(Qt::NoFocus);
 
         QScreen *screen = QApplication::screens().at(0);
         titleLabel = new  QLabel;
@@ -95,7 +100,6 @@ public:
                               "<br>Based on <a href=\"https://github.com/mastermune/\">mastermune</a> & <a href=\"https://github.com/gbrown5/\">gbrown5</a>'s forks"
                               "<br>Version "+version+" for Android by JambonBeurreMan</html>");
         creatorLabel->setTextFormat(Qt::RichText);
-        creatorLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
         creatorLabel->setOpenExternalLinks(true);
 
         if(screen->availableGeometry().height()<=800)
