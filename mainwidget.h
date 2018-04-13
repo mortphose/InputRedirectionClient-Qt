@@ -20,7 +20,7 @@ private:
     QVBoxLayout  *layout;
     QFormLayout  *formLayout;
     QPushButton  *homeButton, *powerButton, *longPowerButton, *settingsConfigButton,
-                 *clearImageButton, *configGamepadButton;
+                 *configGamepadButton;
     QLineEdit    *addrLineEdit;
     QSlider      *touchOpacitySlider;
     QLabel       *creatorLabel, *titleLabel, *instructionsLabel;
@@ -60,8 +60,6 @@ public:
         longPowerButton->setFocusPolicy(Qt::NoFocus);
         settingsConfigButton = new QPushButton(tr("Settings ⚙️"), this);
         settingsConfigButton->setFocusPolicy(Qt::NoFocus);
-        if (QSysInfo::productType() != "android")
-            clearImageButton = new QPushButton(tr("Clear Image"), this);
         configGamepadButton = new QPushButton(tr("Configure Custom Gamepad 🎮"));
         configGamepadButton->setFocusPolicy(Qt::NoFocus);
 
@@ -141,8 +139,6 @@ public:
         layout->addWidget(longPowerButton);
         layout->addWidget(configGamepadButton);
         layout->addWidget(settingsConfigButton);
-        if (QSysInfo::productType() != "android")
-            layout->addWidget(clearImageButton);
         layout->addWidget(lineB);
         layout->addWidget(instructionsLabel);
         layout->addStretch(1);
@@ -243,12 +239,6 @@ public:
                 settingsConfig->move(this->x() - settingsConfig->width() - 5,this->y());
                 settingsConfig->show();
             } else settingsConfig->hide();
-        });
-
-        connect(clearImageButton, &QPushButton::released, this,
-                [this](void)
-        {
-           touchScreen->clearImage();
         });
 
         connect(touchOpacitySlider, &QSlider::valueChanged, this,
