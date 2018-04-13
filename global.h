@@ -40,12 +40,6 @@ typedef uint8_t u8;
 int appScreenTo3dsX(int);
 int appScreenTo3dsY(int);
 
-struct TouchButton
-{
-    int x, y;
-};
-
-
 extern std::vector<ShortCut> listShortcuts;
 QGamepadManager::GamepadButton variantToButton(QVariant variant);
 ShortCut variantToShortCut(QVariant variant);
@@ -73,12 +67,11 @@ extern QGamepadManager::GamepadButton homeButton;
 extern QGamepadManager::GamepadButton powerButton;
 extern QGamepadManager::GamepadButton powerLongButton;
 
+
 extern QGamepadManager::GamepadButton touchButton1;
 extern QGamepadManager::GamepadButton touchButton2;
 extern QGamepadManager::GamepadButton touchButton3;
 extern QGamepadManager::GamepadButton touchButton4;
-
-extern TouchButton tbOne, tbTwo, tbThree, tbFour;
 
 extern QGamepadManager::GamepadButton hidButtonsAB[2];
 extern QGamepadManager::GamepadButton hidButtonsMiddle[8];

@@ -25,26 +25,12 @@ bool touchScreenPressed;
 QSize touchScreenSize = QSize(TOUCH_SCREEN_WIDTH, TOUCH_SCREEN_HEIGHT);
 QPoint touchScreenPosition;
 
-QGamepadManager::GamepadButton homeButton = variantToButton(settings.value("ButtonHome", QGamepadManager::ButtonInvalid));
-QGamepadManager::GamepadButton powerButton = variantToButton(settings.value("ButtonPower", QGamepadManager::ButtonInvalid));
-QGamepadManager::GamepadButton powerLongButton = variantToButton(settings.value("ButtonPowerLong", QGamepadManager::ButtonInvalid));
-
-QGamepadManager::GamepadButton touchButton1 = variantToButton(settings.value("ButtonT1", QGamepadManager::ButtonInvalid));
-QGamepadManager::GamepadButton touchButton2 = variantToButton(settings.value("ButtonT2", QGamepadManager::ButtonInvalid));
-QGamepadManager::GamepadButton touchButton3 = variantToButton(settings.value("ButtonT3", QGamepadManager::ButtonInvalid));
-QGamepadManager::GamepadButton touchButton4 = variantToButton(settings.value("ButtonT4", QGamepadManager::ButtonInvalid));
-
-TouchButton tbOne={.x=settings.value("touchButton1X").toInt(),
-                   .y=settings.value("touchButton1Y").toInt()};
-
-TouchButton tbTwo={.x=settings.value("touchButton2X").toInt(),
-                   .y=settings.value("touchButton2Y").toInt()};
-
-TouchButton tbThree={.x=settings.value("touchButton3X").toInt(),
-                     .y=settings.value("touchButton3Y").toInt()};
-
-TouchButton tbFour={.x=settings.value("touchButton4X").toInt(),
-                    .y=settings.value("touchButton4Y").toInt()};
+QGamepadManager::GamepadButton homeButton
+    = variantToButton(settings.value("ButtonHome", QGamepadManager::ButtonInvalid));
+QGamepadManager::GamepadButton powerButton
+    = variantToButton(settings.value("ButtonPower", QGamepadManager::ButtonInvalid));
+QGamepadManager::GamepadButton powerLongButton
+    = variantToButton(settings.value("ButtonPowerLong", QGamepadManager::ButtonInvalid));
 
 QGamepadManager::GamepadButton hidButtonsAB[2]={
 variantToButton(settings.value("ButtonA", QGamepadManager::ButtonA)),
