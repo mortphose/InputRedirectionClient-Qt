@@ -48,7 +48,9 @@ public:
         touchOpacitySlider->setRange(0, 10);
         touchOpacitySlider->setValue(10);
         touchOpacitySlider->setTickInterval(1);
-        //formLayout->addRow(tr("TS Opacity"), touchOpacitySlider);
+
+        if (QSysInfo::productType() != "android")
+            formLayout->addRow(tr("TS Opacity"), touchOpacitySlider);
 
         homeButton = new QPushButton(tr("Home 🏠"), this);
         homeButton->setFocusPolicy(Qt::NoFocus);
@@ -58,7 +60,8 @@ public:
         longPowerButton->setFocusPolicy(Qt::NoFocus);
         settingsConfigButton = new QPushButton(tr("Settings ⚙️"), this);
         settingsConfigButton->setFocusPolicy(Qt::NoFocus);
-        //clearImageButton = new QPushButton(tr("Clear Image"), this);
+        if (QSysInfo::productType() != "android")
+            clearImageButton = new QPushButton(tr("Clear Image"), this);
         configGamepadButton = new QPushButton(tr("Configure Custom Gamepad 🎮"));
         configGamepadButton->setFocusPolicy(Qt::NoFocus);
 
@@ -138,7 +141,8 @@ public:
         layout->addWidget(longPowerButton);
         layout->addWidget(configGamepadButton);
         layout->addWidget(settingsConfigButton);
-        //layout->addWidget(clearImageButton);
+        if (QSysInfo::productType() != "android")
+            layout->addWidget(clearImageButton);
         layout->addWidget(lineB);
         layout->addWidget(instructionsLabel);
         layout->addStretch(1);
@@ -241,20 +245,21 @@ public:
             } else settingsConfig->hide();
         });
 
-        /*connect(clearImageButton, &QPushButton::released, this,
+        connect(clearImageButton, &QPushButton::released, this,
                 [this](void)
         {
            touchScreen->clearImage();
-        });*/
+        });
 
-        /*connect(touchOpacitySlider, &QSlider::valueChanged, this,
+        connect(touchOpacitySlider, &QSlider::valueChanged, this,
                 [this](int value)
         {
             touchScreen->setWindowOpacity(value / 10.0);
             touchScreen->update();
-        });*/
+        });
 
-        //touchScreen = new TouchScreen(nullptr);
+        if (QSysInfo::productType() != "android")
+            touchScreen = new TouchScreen(nullptr);
         settingsConfig = new ConfigWindow(nullptr, touchScreen);
         this->setWindowTitle(tr("InputRedirectionClient-Qt"));
 
@@ -264,8 +269,11 @@ public:
     void show(void)
     {
         QWidget::show();
-        //touchScreen->move(this->x() + this->width() + 5,this->y());
-        //touchScreen->show();
+        if (QSysInfo::productType() != "android")
+        {
+            touchScreen->move(this->x() + this->width() + 5,this->y());
+            touchScreen->show();
+        }
         settingsConfig->hide();
     }
 
@@ -285,18 +293,23 @@ public:
          {
              settings.remove(tr("tsShortcut%1").arg(i));
          }
-        //touchScreen->close();
         settingsConfig->close();
 
-        //touchScreen->setTouchScreenPressed(false);
-        //delete touchScreen;
+        if (QSysInfo::productType() != "android")
+        {
+            touchScreen->close();
+            touchScreen->setTouchScreenPressed(false);
+            delete touchScreen;
+        }
+
         ev->accept();
     }
 
     //Move touchscreen window with main window if moved
     void moveEvent(QMoveEvent *event)
     {
-        //touchScreen->move(touchScreen->pos() + (event->pos() - event->oldPos()));
+        if (QSysInfo::productType() != "android")
+            touchScreen->move(touchScreen->pos() + (event->pos() - event->oldPos()));
     }
 
     //When main window is opened, load shortcut settings
