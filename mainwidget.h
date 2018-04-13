@@ -65,8 +65,15 @@ public:
         QScreen *screen = QApplication::screens().at(0);
         titleLabel = new  QLabel;
         titleLabel->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Maximum);
-        QPixmap title(":/myressources/logo/InputRedirectionClient.png");
-        titleLabel->setPixmap(title.scaledToWidth(screen->availableGeometry().width()-20));
+        QPixmap title;
+        if (QSysInfo::productType() == "android")
+        {
+            title.load(":/myressources/logo/InputRedirectionClient.png");
+            titleLabel->setPixmap(title.scaledToWidth(screen->availableGeometry().width()-20));
+        } else {
+            title.load(":/myressources/logo/512x512_v2.png");
+            titleLabel->setPixmap(title.scaledToWidth(width()/2));
+        }
         titleLabel->setAlignment(Qt::AlignCenter);
 
         lineA = new QFrame;
