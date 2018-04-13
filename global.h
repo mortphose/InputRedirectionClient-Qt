@@ -128,6 +128,6 @@ class Worker : public QObject {
 
 };
 
-extern Worker worker;
+extern Worker* worker;
 
 #endif // GLOBAL_H

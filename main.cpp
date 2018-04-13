@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     timer.setInterval(20);
     timer.moveToThread(thread);
 
-    Worker* worker = new Worker();
+    worker = new Worker();
     worker->moveToThread(thread);
 
     QObject::connect(thread, SIGNAL (started()), &timer, SLOT (start()));

@@ -330,8 +330,8 @@ public:
 
     virtual ~Widget(void)
     {
-        worker.setLeftAxis(0.0, 0.0);
-        worker.setRightAxis(0.0, 0.0);
+        worker->setLeftAxis(0.0, 0.0);
+        worker->setRightAxis(0.0, 0.0);
 
         buttons = 0;
         interfaceButtons = 0;

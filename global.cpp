@@ -4,7 +4,7 @@
 
 QSettings settings("TuxSH", "InputRedirectionClient-Qt");
 
-Worker worker;
+Worker* worker;
 Settings btnSettings;
 double tsRatio;
 

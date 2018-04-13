@@ -88,19 +88,19 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
 
         if(axis==axLeftX)
         {
-           worker.setLeftAxis(value, worker.getLeftAxis().y);
-           worker.setPreviousLAxis(worker.getLeftAxis().x, worker.getPreviousLAxis().y);
+           worker->setLeftAxis(value, worker->getLeftAxis().y);
+           worker->setPreviousLAxis(worker->getLeftAxis().x, worker->getPreviousLAxis().y);
         }
         else
         if(axis==axLeftY)
         {
-            worker.setLeftAxis(worker.getLeftAxis().x, yAxisMultiplier * -value); // for some reason qt inverts this
-            worker.setPreviousLAxis(worker.getPreviousLAxis().x, worker.getLeftAxis().y);
+            worker->setLeftAxis(worker->getLeftAxis().x, yAxisMultiplier * -value); // for some reason qt inverts this
+            worker->setPreviousLAxis(worker->getPreviousLAxis().x, worker->getLeftAxis().y);
         }
         else
         if(axis==axRightX)
         {
-            if (!btnSettings.isCStickDisabled()) worker.setRightAxis(value, worker.getRightAxis().y);
+            if (!btnSettings.isCStickDisabled()) worker->setRightAxis(value, worker->getRightAxis().y);
 
             if (btnSettings.isMonsterHunterCamera())
             {
@@ -134,18 +134,18 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
                 {
                     btnSettings.setSmashingH(true);
                     buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsAB[0]); // press A
-                    worker.setLeftAxis(-1.2, worker.getLeftAxis().y);
+                    worker->setLeftAxis(-1.2, worker->getLeftAxis().y);
                 } else if (value > 0.5 && value < 1.2) // RS tilted right
                 {
                     btnSettings.setSmashingH(true);
                     buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsAB[0]); // press A
-                    worker.setLeftAxis(1.2, worker.getLeftAxis().y);
+                    worker->setLeftAxis(1.2, worker->getLeftAxis().y);
                 } else { // RS neutral, release buttons
                     if (btnSettings.isSmashingH())
                     {
                         if (!btnSettings.isSmashingV())
                             buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsAB[0])); // Release A
-                        worker.setLeftAxis(worker.getPreviousLAxis().x, worker.getRightAxis().y);
+                        worker->setLeftAxis(worker->getPreviousLAxis().x, worker->getRightAxis().y);
                         btnSettings.setSmashingH(false);
                     }
                 }
@@ -154,14 +154,14 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
         else
         if(axis==axRightY)
         {
-            worker.setRightAxis(worker.getRightAxis().x, yAxisMultiplierCpp * -value);
+            worker->setRightAxis(worker->getRightAxis().x, yAxisMultiplierCpp * -value);
 
             if (btnSettings.isMonsterHunterCamera())
             {
-                if (worker.getRightAxis().y > -1.2 && worker.getRightAxis().y  < -0.5) // RS tilted down
+                if (worker->getRightAxis().y > -1.2 && worker->getRightAxis().y  < -0.5) // RS tilted down
                 {
                     buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsMiddle[5]); // press Down
-                } else if (worker.getRightAxis().y  > 0.5 && worker.getRightAxis().y  < 1.2) // RS tilted up
+                } else if (worker->getRightAxis().y  > 0.5 && worker->getRightAxis().y  < 1.2) // RS tilted up
                 {
                     buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsMiddle[4]); // press Up
                 } else { // RS neutral, release buttons
@@ -171,10 +171,10 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
             }
             if (btnSettings.isRightStickFaceButtons())
             {
-                if (worker.getRightAxis().y > -1.2 && worker.getRightAxis().y < -0.5) // RS tilted down
+                if (worker->getRightAxis().y > -1.2 && worker->getRightAxis().y < -0.5) // RS tilted down
                 {
                     buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsAB[1]); // press B
-                } else if (worker.getRightAxis().y  > 0.5 && worker.getRightAxis().y < 1.2) // RS tilted up
+                } else if (worker->getRightAxis().y  > 0.5 && worker->getRightAxis().y < 1.2) // RS tilted up
                 {
                     buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsXY[0]); // press X
                 } else { // RS neutral, release buttons
@@ -184,29 +184,29 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
             }
             if (btnSettings.isRightStickSmash())
             {
-                if (worker.getRightAxis().y > -1.2 && worker.getRightAxis().y < -0.5) // RS tilted down
+                if (worker->getRightAxis().y > -1.2 && worker->getRightAxis().y < -0.5) // RS tilted down
                 {
                     btnSettings.setSmashingV(true);
                     buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsAB[0]); // press A
-                    worker.setLeftAxis(worker.getLeftAxis().x, -1.2);
-                } else if (worker.getRightAxis().y  > 0.5 && worker.getRightAxis().y  < 1.2) // RS tilted up
+                    worker->setLeftAxis(worker->getLeftAxis().x, -1.2);
+                } else if (worker->getRightAxis().y  > 0.5 && worker->getRightAxis().y  < 1.2) // RS tilted up
                 {
                     btnSettings.setSmashingV(true);
                     buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsAB[0]); // press A
-                    worker.setLeftAxis(worker.getLeftAxis().x, 1.2);
+                    worker->setLeftAxis(worker->getLeftAxis().x, 1.2);
                 } else { // RS neutral, release button A
                     if (btnSettings.isSmashingV())
                     {
                         if (!btnSettings.isSmashingH())
                             buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsAB[0])); // Release A
-                        worker.setLeftAxis(worker.getLeftAxis().x, worker.getPreviousLAxis().y);
+                        worker->setLeftAxis(worker->getLeftAxis().x, worker->getPreviousLAxis().y);
                         btnSettings.setSmashingV(false);
                     }
                 }
             }
             if (btnSettings.isCStickDisabled())
             {
-                worker.setRightAxis(0.0, 0.0);
+                worker->setRightAxis(0.0, 0.0);
             }
         }
     });
