@@ -4,28 +4,32 @@
 
 #include "mainwidget.h"
 #include "gpmanager.h"
+#include "global.h"
 #include <QTimer>
-
-struct FrameTimer : public QTimer {
-    FrameTimer(QObject *parent = nullptr) : QTimer(parent)
-    {
-        connect(this, &QTimer::timeout, this,
-                [](void)
-        {
-            if (timerEnabled)
-                sendFrame();
-        });
-    }
-};
+#include <QThread>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     Widget w;
     GamepadMonitor m(&w);
-    FrameTimer t(&w);
-    t.start(50);
-    w.show();
 
-    return a.exec();
+    w.show();
+    QThread* thread = new QThread();
+    QTimer timer;
+    timer.setInterval(20);
+    timer.moveToThread(thread);
+
+    Worker* worker = new Worker();
+    worker->moveToThread(thread);
+
+    QObject::connect(thread, SIGNAL (started()), &timer, SLOT (start()));
+    QObject::connect(worker, SIGNAL (finished()), thread, SLOT (quit()));
+    QObject::connect(thread, SIGNAL (finished()), thread, SLOT (deleteLater()));
+    QObject::connect(worker, SIGNAL (finished()), worker, SLOT (deleteLater()));
+    QObject::connect(&timer, SIGNAL (timeout()), worker, SLOT(sendFrame()));
+    thread->start();
+    a.exec();
+    worker->closeThread();
+    return 0;
 }

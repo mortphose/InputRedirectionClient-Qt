@@ -1,32 +1,29 @@
 #include "global.h"
+#include <math.h>
 #include "gpmanager.h"
 
 QSettings settings("TuxSH", "InputRedirectionClient-Qt");
+
+Worker worker;
+Settings btnSettings;
+double tsRatio;
+
+std::vector<ShortCut> listShortcuts;
 
 QGamepadManager::GamepadButtons buttons = 0;
 u32 interfaceButtons = 0;
 int yAxisMultiplier = 1, yAxisMultiplierCpp = 1;
 bool shouldSwapStick = false;
-bool monsterHunterCamera = false;
-bool rightStickSmash = false;
-bool isSmashingH = false;
-bool isSmashingV = false;
-bool rightStickFaceButtons = false;
-bool cStickDisabled = false;
-
-double lx = 0.0, ly = 0.0;
-double rx = 0.0, ry = 0.0;
-double previousLX = lx, previousLY = ly;
+int CPAD_BOUND = (settings.contains("StickBound") ? settings.value("StickBound").toInt() : 1488);
+int CPP_BOUND = (settings.contains("CppBound") ? settings.value("CppBound").toInt() : 127);
 
 GamepadConfigurator *gpConfigurator;
 
 QString ipAddress;
-bool timerEnabled = false;
 
 bool touchScreenPressed;
-QSize touchScreenSize;
+QSize touchScreenSize = QSize(TOUCH_SCREEN_WIDTH, TOUCH_SCREEN_HEIGHT);
 QPoint touchScreenPosition;
-double tsRatio = 1;
 
 QGamepadManager::GamepadButton homeButton = variantToButton(settings.value("ButtonHome", QGamepadManager::ButtonInvalid));
 QGamepadManager::GamepadButton powerButton = variantToButton(settings.value("ButtonPower", QGamepadManager::ButtonInvalid));
@@ -36,14 +33,18 @@ QGamepadManager::GamepadButton touchButton1 = variantToButton(settings.value("Bu
 QGamepadManager::GamepadButton touchButton2 = variantToButton(settings.value("ButtonT2", QGamepadManager::ButtonInvalid));
 QGamepadManager::GamepadButton touchButton3 = variantToButton(settings.value("ButtonT3", QGamepadManager::ButtonInvalid));
 QGamepadManager::GamepadButton touchButton4 = variantToButton(settings.value("ButtonT4", QGamepadManager::ButtonInvalid));
-int touchButton1X = settings.value("touchButton1X", 0).toInt();
-int touchButton1Y = settings.value("touchButton1Y", 0).toInt();
-int touchButton2X = settings.value("touchButton2X", 0).toInt();
-int touchButton2Y = settings.value("touchButton2Y", 0).toInt();
-int touchButton3X = settings.value("touchButton3X", 0).toInt();
-int touchButton3Y = settings.value("touchButton3Y", 0).toInt();
-int touchButton4X = settings.value("touchButton4X", 0).toInt();
-int touchButton4Y = settings.value("touchButton4Y", 0).toInt();
+
+TouchButton tbOne={.x=settings.value("touchButton1X").toInt(),
+                   .y=settings.value("touchButton1Y").toInt()};
+
+TouchButton tbTwo={.x=settings.value("touchButton2X").toInt(),
+                   .y=settings.value("touchButton2Y").toInt()};
+
+TouchButton tbThree={.x=settings.value("touchButton3X").toInt(),
+                     .y=settings.value("touchButton3Y").toInt()};
+
+TouchButton tbFour={.x=settings.value("touchButton4X").toInt(),
+                    .y=settings.value("touchButton4Y").toInt()};
 
 QGamepadManager::GamepadButton hidButtonsAB[2]={
 variantToButton(settings.value("ButtonA", QGamepadManager::ButtonA)),
@@ -68,7 +69,40 @@ QGamepadManager::GamepadButton irButtons[2] = {
     variantToButton(settings.value("ButtonZL", QGamepadManager::ButtonL2))};
 
 
-void sendFrame(void)
+void Worker::setLeftAxis(double x, double y)
+{
+    leftAxis.x = x;
+    leftAxis.y = y;
+}
+
+void Worker::setRightAxis(double x, double y)
+{
+    rightAxis.x = x;
+    rightAxis.y = y;
+}
+
+void Worker::setPreviousLAxis(double x, double y)
+{
+    previousLeftAxis.x = x;
+    previousLeftAxis.y = y;
+}
+
+MyAxis Worker::getLeftAxis()
+{
+    return leftAxis;
+}
+
+MyAxis Worker::getRightAxis()
+{
+    return rightAxis;
+}
+
+MyAxis Worker::getPreviousLAxis()
+{
+    return previousLeftAxis;
+}
+
+void Worker::sendFrame(void)
 {
     u32 hidPad = 0xfff;
     for(u32 i = 0; i < 2; i++)
@@ -102,31 +136,32 @@ void sendFrame(void)
 
     if(touchScreenPressed)
     {
+
         u32 x = (u32)(0xfff * std::min(std::max(0, touchScreenPosition.x()),
-                                       touchScreenSize.width())) / touchScreenSize.width();
+                                       TOUCH_SCREEN_WIDTH*touchScreenPosition.x())) / touchScreenSize.width();
         u32 y = (u32)(0xfff * std::min(std::max(0, touchScreenPosition.y()),
-                                       touchScreenSize.height())) / touchScreenSize.height();
+                                       TOUCH_SCREEN_HEIGHT*touchScreenPosition.y())) / touchScreenSize.height();
 
         touchScreenState = (1 << 24) | (y << 12) | x;
     }
 
-    if(lx != 0.0 || ly != 0.0)
+    if(leftAxis.x != 0.0 || leftAxis.y != 0.0)
       {
-          u32 x = (u32)(lx * CPAD_BOUND + 0x800);
-          u32 y = (u32)(ly * CPAD_BOUND + 0x800);
-          x = x >= 0xfff ? (lx < 0.0 ? 0x000 : 0xfff) : x;
-          y = y >= 0xfff ? (ly < 0.0 ? 0x000 : 0xfff) : y;
+          u32 x = (u32)(leftAxis.x * CPAD_BOUND + 0x800);
+          u32 y = (u32)(leftAxis.y * CPAD_BOUND + 0x800);
+          x = x >= 0xfff ? (leftAxis.x < 0.0 ? 0x000 : 0xfff) : x;
+          y = y >= 0xfff ? (leftAxis.y < 0.0 ? 0x000 : 0xfff) : y;
 
           circlePadState = (y << 12) | x;
       }
 
-      if(rx != 0.0 || ry != 0.0 || irButtonsState != 0)
+      if(rightAxis.x != 0.0 || rightAxis.y != 0.0 || irButtonsState != 0)
       {
           // We have to rotate the c-stick position 45°. Thanks, Nintendo.
-          u32 x = (u32)(M_SQRT1_2 * (rx + ry) * CPP_BOUND + 0x80);
-          u32 y = (u32)(M_SQRT1_2 * (ry - rx) * CPP_BOUND + 0x80);
-          x = x >= 0xff ? (rx < 0.0 ? 0x00 : 0xff) : x;
-          y = y >= 0xff ? (ry < 0.0 ? 0x00 : 0xff) : y;
+          u32 x = (u32)(M_SQRT1_2 * (rightAxis.x + rightAxis.y) * CPP_BOUND + 0x80);
+          u32 y = (u32)(M_SQRT1_2 * (rightAxis.y - rightAxis.x) * CPP_BOUND + 0x80);
+          x = x >= 0xff ? (rightAxis.x < 0.0 ? 0x00 : 0xff) : x;
+          y = y >= 0xff ? (rightAxis.y < 0.0 ? 0x00 : 0xff) : y;
 
           cppState = (y << 24) | (x << 16) | (irButtonsState << 8) | 0x81;
       }
@@ -147,4 +182,16 @@ QGamepadManager::GamepadButton variantToButton(QVariant variant)
     button = static_cast<QGamepadManager::GamepadButton>(variant.toInt());
 
     return button;
+}
+
+int appScreenTo3dsX(int posX)
+{
+    qDebug() << "PosX: " << posX;
+    return TOUCH_SCREEN_WIDTH*((touchScreenSize.height()*posX)/TOUCH_SCREEN_HEIGHT)/touchScreenSize.width();
+}
+
+int appScreenTo3dsY(int posY)
+{
+    qDebug() << "PosX: " << posY;
+    return TOUCH_SCREEN_HEIGHT*((touchScreenSize.width()*posY)/TOUCH_SCREEN_WIDTH)/touchScreenSize.height();
 }

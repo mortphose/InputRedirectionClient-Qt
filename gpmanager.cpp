@@ -21,29 +21,17 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
         {
             interfaceButtons |= 4;
         }
+        for (auto it = listShortcuts.begin(); it != listShortcuts.end(); ++it) {
+            int index = std::distance(listShortcuts.begin(), it);
+            ShortCut curShort = listShortcuts.at(index);
 
-        if (button == touchButton1)
-        {
-            touchScreenPressed = true;
-            touchScreenPosition = QPoint(touchButton1X, touchButton1Y)*tsRatio;
-        }
-        if (button == touchButton2)
-        {
-            touchScreenPressed = true;
-            touchScreenPosition = QPoint(touchButton2X, touchButton2Y)*tsRatio;
-        }
-        if (button == touchButton3)
-        {
-            touchScreenPressed = true;
-            touchScreenPosition = QPoint(touchButton3X, touchButton3Y)*tsRatio;
-        }
-        if (button == touchButton4)
-        {
-            touchScreenPressed = true;
-            touchScreenPosition = QPoint(touchButton4X, touchButton4Y)*tsRatio;
+            if(curShort.button == button)
+            {
+                touchScreenPressed = true;
+                touchScreenPosition = curShort.pos*tsRatio;
+            }
         }
 
-        sendFrame();
     });
 
     connect(QGamepadManager::instance(), &QGamepadManager::gamepadButtonReleaseEvent, this,
@@ -65,13 +53,18 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
             interfaceButtons &= ~4;
         }
 
-        if ((button == touchButton1) || (button == touchButton2)
-                || (button == touchButton3) || (button == touchButton4))
-        {
-            touchScreenPressed = false;
+
+        for (auto it = listShortcuts.begin(); it != listShortcuts.end(); ++it) {
+            int index = std::distance(listShortcuts.begin(), it);
+            ShortCut curShort = listShortcuts.at(index);
+
+            if(curShort.button == button)
+            {
+                touchScreenPressed = false;
+                return;
+            }
         }
 
-        sendFrame();
     });
 
     connect(QGamepadManager::instance(), &QGamepadManager::gamepadAxisEvent, this,
@@ -84,7 +77,7 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
                                      axRightX= QGamepadManager::AxisRightX,
                                      axRightY= QGamepadManager::AxisRightY;
 
-        if(shouldSwapStick)
+        if(btnSettings.isShouldSwapStick())
         {
             axLeftX = QGamepadManager::AxisRightX;
             axLeftY = QGamepadManager::AxisRightY;
@@ -95,21 +88,21 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
 
         if(axis==axLeftX)
         {
-            lx = value;
-            previousLX = lx;
+           worker.setLeftAxis(value, worker.getLeftAxis().y);
+           worker.setPreviousLAxis(worker.getLeftAxis().x, worker.getPreviousLAxis().y);
         }
         else
         if(axis==axLeftY)
         {
-            ly = yAxisMultiplier * -value; // for some reason qt inverts this
-            previousLY = ly;
+            worker.setLeftAxis(worker.getLeftAxis().x, yAxisMultiplier * -value); // for some reason qt inverts this
+            worker.setPreviousLAxis(worker.getPreviousLAxis().x, worker.getLeftAxis().y);
         }
         else
         if(axis==axRightX)
         {
-            if (!cStickDisabled) rx = value;
+            if (!btnSettings.isCStickDisabled()) worker.setRightAxis(value, worker.getRightAxis().y);
 
-            if (monsterHunterCamera)
+            if (btnSettings.isMonsterHunterCamera())
             {
                 if (value > -1.2 && value < -0.5) // RS tilted left
                 {
@@ -122,7 +115,7 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
                     buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsMiddle[2])); // release Right
                 }
             }
-            if (rightStickFaceButtons)
+            if (btnSettings.isRightStickFaceButtons())
             {
                 if (value > -1.2 && value < -0.5) // RS tilted left
                 {
@@ -135,25 +128,25 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
                     buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsAB[0])); // release A
                 }
             }
-            if (rightStickSmash)
+            if (btnSettings.isRightStickSmash())
             {
                 if (value > -1.2 && value < -0.5) // RS tilted left
                 {
-                    isSmashingH = true;
+                    btnSettings.setSmashingH(true);
                     buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsAB[0]); // press A
-                    lx = -1.2;
+                    worker.setLeftAxis(-1.2, worker.getLeftAxis().y);
                 } else if (value > 0.5 && value < 1.2) // RS tilted right
                 {
-                    isSmashingH = true;
+                    btnSettings.setSmashingH(true);
                     buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsAB[0]); // press A
-                    lx = 1.2;
+                    worker.setLeftAxis(1.2, worker.getLeftAxis().y);
                 } else { // RS neutral, release buttons
-                    if (isSmashingH)
+                    if (btnSettings.isSmashingH())
                     {
-                        if (!isSmashingV)
+                        if (!btnSettings.isSmashingV())
                             buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsAB[0])); // Release A
-                        lx = previousLX;
-                        isSmashingH = false;
+                        worker.setLeftAxis(worker.getPreviousLAxis().x, worker.getRightAxis().y);
+                        btnSettings.setSmashingH(false);
                     }
                 }
             }
@@ -161,14 +154,14 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
         else
         if(axis==axRightY)
         {
-            ry = yAxisMultiplierCpp * -value;
+            worker.setRightAxis(worker.getRightAxis().x, yAxisMultiplierCpp * -value);
 
-            if (monsterHunterCamera)
+            if (btnSettings.isMonsterHunterCamera())
             {
-                if (ry > -1.2 && ry < -0.5) // RS tilted down
+                if (worker.getRightAxis().y > -1.2 && worker.getRightAxis().y  < -0.5) // RS tilted down
                 {
                     buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsMiddle[5]); // press Down
-                } else if (ry > 0.5 && ry < 1.2) // RS tilted up
+                } else if (worker.getRightAxis().y  > 0.5 && worker.getRightAxis().y  < 1.2) // RS tilted up
                 {
                     buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsMiddle[4]); // press Up
                 } else { // RS neutral, release buttons
@@ -176,12 +169,12 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
                     buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsMiddle[4])); // Release Up
                 }
             }
-            if (rightStickFaceButtons)
+            if (btnSettings.isRightStickFaceButtons())
             {
-                if (ry > -1.2 && ry < -0.5) // RS tilted down
+                if (worker.getRightAxis().y > -1.2 && worker.getRightAxis().y < -0.5) // RS tilted down
                 {
                     buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsAB[1]); // press B
-                } else if (ry > 0.5 && ry < 1.2) // RS tilted up
+                } else if (worker.getRightAxis().y  > 0.5 && worker.getRightAxis().y < 1.2) // RS tilted up
                 {
                     buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsXY[0]); // press X
                 } else { // RS neutral, release buttons
@@ -189,34 +182,34 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
                     buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsXY[0])); // Release X
                 }
             }
-            if (rightStickSmash)
+            if (btnSettings.isRightStickSmash())
             {
-                if (ry > -1.2 && ry < -0.5) // RS tilted down
+                if (worker.getRightAxis().y > -1.2 && worker.getRightAxis().y < -0.5) // RS tilted down
                 {
-                    isSmashingV = true;
+                    btnSettings.setSmashingV(true);
                     buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsAB[0]); // press A
-                    ly = -1.2;
-                } else if (ry > 0.5 && ry < 1.2) // RS tilted up
+                    worker.setLeftAxis(worker.getLeftAxis().x, -1.2);
+                } else if (worker.getRightAxis().y  > 0.5 && worker.getRightAxis().y  < 1.2) // RS tilted up
                 {
-                    isSmashingV = true;
+                    btnSettings.setSmashingV(true);
                     buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsAB[0]); // press A
-                    ly = 1.2;
+                    worker.setLeftAxis(worker.getLeftAxis().x, 1.2);
                 } else { // RS neutral, release button A
-                    if (isSmashingV)
+                    if (btnSettings.isSmashingV())
                     {
-                        if (!isSmashingH)
+                        if (!btnSettings.isSmashingH())
                             buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsAB[0])); // Release A
-                        ly = previousLY;
-                        isSmashingV = false;
+                        worker.setLeftAxis(worker.getLeftAxis().x, worker.getPreviousLAxis().y);
+                        btnSettings.setSmashingV(false);
                     }
                 }
             }
-            if (cStickDisabled)
+            if (btnSettings.isCStickDisabled())
             {
-                ry = 0;
+                worker.setRightAxis(0.0, 0.0);
             }
         }
-
-        sendFrame();
     });
 }
+
+
