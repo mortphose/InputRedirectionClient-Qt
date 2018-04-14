@@ -47,6 +47,8 @@ ShortCut variantToShortCut(QVariant variant);
 extern int id, fid;
 
 extern QSettings settings;
+extern QSettings profileSettings;
+extern QString buttonProfile;
 
 extern QGamepadManager::GamepadButtons buttons;
 extern u32 interfaceButtons;
@@ -66,12 +68,6 @@ extern double tsRatio;
 extern QGamepadManager::GamepadButton homeButton;
 extern QGamepadManager::GamepadButton powerButton;
 extern QGamepadManager::GamepadButton powerLongButton;
-
-
-extern QGamepadManager::GamepadButton touchButton1;
-extern QGamepadManager::GamepadButton touchButton2;
-extern QGamepadManager::GamepadButton touchButton3;
-extern QGamepadManager::GamepadButton touchButton4;
 
 extern QGamepadManager::GamepadButton hidButtonsAB[2];
 extern QGamepadManager::GamepadButton hidButtonsMiddle[8];

@@ -15,10 +15,11 @@ public slots:
 
 private:
     QLabel *bgLabel;
-    TsShortcut tsShortcutGui;
 
 public:
     TouchScreen(QWidget *parent = nullptr);
+
+    TsShortcut tsShortcutGui;
 
     bool ellipNeedDraw;
 

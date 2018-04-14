@@ -87,7 +87,7 @@ void TouchScreen::ShowContextMenu(const QPoint& pos)
 
          if(!strPic.isNull())
          {
-             settings.setValue("tsBackgroundImage", strPic);
+             profileSettings.setValue(buttonProfile+"/TouchScreen/Image", strPic);
              updatePixmap();
          }
     }
@@ -170,7 +170,7 @@ void TouchScreen::closeEvent(QCloseEvent *ev)
 
 void TouchScreen::updatePixmap(void)
 {
-    QString strPic = settings.value("tsBackgroundImage", "").toString();
+    QString strPic = profileSettings.value(buttonProfile+"/TouchScreen/Image", "").toString();
     QPixmap newPic(strPic);
 
     if (newPic.isNull())
@@ -183,7 +183,7 @@ void TouchScreen::updatePixmap(void)
 
 void TouchScreen::paintEvent(QPaintEvent* e)
 {
-    QString strPic = settings.value("tsBackgroundImage", "").toString();
+    QString strPic = profileSettings.value(buttonProfile+"/TouchScreen/Image", "").toString();
     QPixmap newPic(strPic);
 
     if (newPic.isNull())
@@ -219,7 +219,7 @@ void TouchScreen::paintEvent(QPaintEvent* e)
 
 void TouchScreen::clearImage(void)
 {
-    settings.setValue("tsBackgroundImage", "");
+    profileSettings.setValue(buttonProfile+"/TouchScreen/Image", "");
     updatePixmap();
 }
 

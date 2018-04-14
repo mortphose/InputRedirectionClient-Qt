@@ -151,7 +151,7 @@ public:
                 [](const QString &text)
         {
             ipAddress = text;
-            settings.setValue("ipAddress", text);
+            settings.setValue("InputRedirection/ipAddress", text);
         });
 
         connect(configGamepadButton, &QPushButton::released, this,
@@ -253,7 +253,7 @@ public:
         settingsConfig = new ConfigWindow(nullptr, touchScreen);
         this->setWindowTitle(tr("InputRedirectionClient-Qt"));
 
-        addrLineEdit->setText(settings.value("ipAddress", "").toString());
+        addrLineEdit->setText(settings.value("InputRedirection/ipAddress", "").toString());
     }
 
     void show(void)
@@ -264,25 +264,10 @@ public:
             touchScreen->move(this->x() + this->width() + 5,this->y());
             touchScreen->show();
         }
-        settingsConfig->hide();
     }
 
-    //When closing, save shortcuts
     void closeEvent(QCloseEvent *ev)
     {
-        //Save shortcuts
-        unsigned int i = 0;
-        for (i=0; i<listShortcuts.size(); i++)
-         {
-            QString valName = tr("tsShortcut%1").arg(i);
-             settings.setValue(valName, qVariantFromValue(listShortcuts[i]));
-         }
-
-        //Remove leftover settings
-        for(; settings.contains(tr("tsShortcut%1").arg(i)); i++)
-         {
-             settings.remove(tr("tsShortcut%1").arg(i));
-         }
         settingsConfig->close();
 
         if (QSysInfo::productType() != "android")
@@ -305,30 +290,31 @@ public:
     //When main window is opened, load shortcut settings
     void showEvent(QShowEvent *event)
     {
-        qRegisterMetaType<ShortCut>("ShortCut");
-        qRegisterMetaTypeStreamOperators<ShortCut>("ShortCut");
+        listShortcuts.clear();
+        uint shortCutCount =
+            profileSettings.value(buttonProfile+"/TouchScreen/Shortcut/Count").toInt();
 
-    QString valName = "tsShortcut0";
-    for(int i = 0; settings.contains(valName); i++)
-     {
-        valName = tr("tsShortcut%1").arg(i);
-        QVariant variant = settings.value(valName);
+        QString valPath = buttonProfile + "/TouchScreen/Shortcut/1";
+        for(int i = 1; listShortcuts.size() < shortCutCount || i > 17; i++)
+        {
+            valPath = buttonProfile + tr("/TouchScreen/Shortcut/%1").arg(i);
 
-        ShortCut curShort = variant.value<ShortCut>();
-         if(variant.isValid() && curShort.name != "")
-         {
-             if(curShort.name != "")
-             {
-              listShortcuts.push_back(curShort);
-             }
+            ShortCut shortCutToLoad;
+            shortCutToLoad.name = profileSettings.value(valPath+"/Name").toString();
+            shortCutToLoad.button = variantToButton(profileSettings.value(valPath+"/Button"));
+            shortCutToLoad.pos = QPoint(
+                        profileSettings.value(valPath+"/X").toInt(),
+                        profileSettings.value(valPath+"/Y").toInt());
+            shortCutToLoad.color = QColor(
+                        profileSettings.value(valPath+"/R").toInt(),
+                        profileSettings.value(valPath+"/G").toInt(),
+                        profileSettings.value(valPath+"/B").toInt());
 
-         }
-         else
-         {
-             settings.remove(tr("tsShortcut%1").arg(i));
-         }
-
-     }
+            if (shortCutToLoad.name != "")
+            {
+                listShortcuts.push_back(shortCutToLoad);
+            }
+        }
     }
 
     virtual ~Widget(void)

@@ -6,40 +6,48 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     this->setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint);
     this->setWindowTitle(tr("InputRedirectionClient-Qt - Button Config"));
 
-    comboBoxA = populateItems(variantToButton(settings.value("ButtonA", QGamepadManager::ButtonA)));
-    comboBoxA->setFocusPolicy(Qt::NoFocus);
-    comboBoxB = populateItems(variantToButton(settings.value("ButtonB", QGamepadManager::ButtonB)));
-    comboBoxB->setFocusPolicy(Qt::NoFocus);
-    comboBoxX = populateItems(variantToButton(settings.value("ButtonX", QGamepadManager::ButtonX)));
-    comboBoxX->setFocusPolicy(Qt::NoFocus);
-    comboBoxY = populateItems(variantToButton(settings.value("ButtonY", QGamepadManager::ButtonY)));
-    comboBoxY->setFocusPolicy(Qt::NoFocus);
-    comboBoxUp = populateItems(variantToButton(settings.value("ButtonUp", QGamepadManager::ButtonUp)));
-    comboBoxUp->setFocusPolicy(Qt::NoFocus);
-    comboBoxDown = populateItems(variantToButton(settings.value("ButtonDown", QGamepadManager::ButtonDown)));
-    comboBoxDown->setFocusPolicy(Qt::NoFocus);
-    comboBoxLeft = populateItems(variantToButton(settings.value("ButtonLeft", QGamepadManager::ButtonLeft)));
-    comboBoxLeft->setFocusPolicy(Qt::NoFocus);
-    comboBoxRight = populateItems(variantToButton(settings.value("ButtonRight", QGamepadManager::ButtonRight)));
-    comboBoxRight->setFocusPolicy(Qt::NoFocus);
-    comboBoxL = populateItems(variantToButton(settings.value("ButtonL", QGamepadManager::ButtonL1)));
-    comboBoxL->setFocusPolicy(Qt::NoFocus);
-    comboBoxR = populateItems(variantToButton(settings.value("ButtonR", QGamepadManager::ButtonR1)));
-    comboBoxR->setFocusPolicy(Qt::NoFocus);
-    comboBoxSelect = populateItems(variantToButton(settings.value("ButtonSelect", QGamepadManager::ButtonSelect)));
-    comboBoxSelect->setFocusPolicy(Qt::NoFocus);
-    comboBoxStart = populateItems(variantToButton(settings.value("ButtonStart", QGamepadManager::ButtonStart)));
-    comboBoxStart->setFocusPolicy(Qt::NoFocus);
-    comboBoxZL = populateItems(variantToButton(settings.value("ButtonZL", QGamepadManager::ButtonL2)));
-    comboBoxZL->setFocusPolicy(Qt::NoFocus);
-    comboBoxZR = populateItems(variantToButton(settings.value("ButtonZR", QGamepadManager::ButtonR2)));
-    comboBoxZR->setFocusPolicy(Qt::NoFocus);
-    comboBoxHome = populateItems(variantToButton(settings.value("ButtonHome", QGamepadManager::ButtonInvalid)));
-    comboBoxHome->setFocusPolicy(Qt::NoFocus);
-    comboBoxPower = populateItems(variantToButton(settings.value("ButtonPower", QGamepadManager::ButtonInvalid)));
-    comboBoxPower->setFocusPolicy(Qt::NoFocus);
-    comboBoxPowerLong = populateItems(variantToButton(settings.value("ButtonPowerLong", QGamepadManager::ButtonInvalid)));
-    comboBoxPowerLong->setFocusPolicy(Qt::NoFocus);
+    touchScreen = ts;
+
+    comboBoxProfiles = new QComboBox(nullptr);
+    comboBoxProfiles->addItems(profileSettings.childGroups());
+    comboBoxProfiles->setCurrentIndex(comboBoxProfiles->findText(buttonProfile));
+
+    profileSettings.beginGroup(buttonProfile);
+
+    comboBoxA = populateItems(variantToButton(
+        profileSettings.value("3DS/A", QGamepadManager::ButtonA)));
+    comboBoxB = populateItems(variantToButton(
+        profileSettings.value("3DS/B", QGamepadManager::ButtonB)));
+    comboBoxX = populateItems(variantToButton(
+        profileSettings.value("3DS/X", QGamepadManager::ButtonX)));
+    comboBoxY = populateItems(variantToButton(
+        profileSettings.value("3DS/Y", QGamepadManager::ButtonY)));
+    comboBoxUp = populateItems(variantToButton(
+        profileSettings.value("3DS/Up", QGamepadManager::ButtonUp)));
+    comboBoxDown = populateItems(variantToButton(
+        profileSettings.value("3DS/Down", QGamepadManager::ButtonDown)));
+    comboBoxLeft = populateItems(variantToButton(
+        profileSettings.value("3DS/Left", QGamepadManager::ButtonLeft)));
+    comboBoxRight = populateItems(variantToButton(
+        profileSettings.value("3DS/Right", QGamepadManager::ButtonRight)));
+    comboBoxL = populateItems(variantToButton(
+        profileSettings.value("3DS/L", QGamepadManager::ButtonL1)));
+    comboBoxR = populateItems(variantToButton(
+        profileSettings.value("3DS/R", QGamepadManager::ButtonR1)));
+    comboBoxSelect = populateItems(variantToButton(
+        profileSettings.value("3DS/Select", QGamepadManager::ButtonSelect)));
+    comboBoxStart = populateItems(variantToButton(
+        profileSettings.value("3DS/Start", QGamepadManager::ButtonStart)));
+    comboBoxZL = populateItems(variantToButton(
+        profileSettings.value("3DS/ZL", QGamepadManager::ButtonL2)));
+    comboBoxZR = populateItems(variantToButton(
+        profileSettings.value("3DS/ZR", QGamepadManager::ButtonR2)));
+    comboBoxHome = populateItems(variantToButton(
+        profileSettings.value("3DS/Home", QGamepadManager::ButtonInvalid)));
+    comboBoxPower = populateItems(variantToButton(
+        profileSettings.value("3DS/Power", QGamepadManager::ButtonInvalid)));
+    comboBoxPowerLong = populateItems(variantToButton(
+        profileSettings.value("3DS/PowerLong", QGamepadManager::ButtonInvalid)));
 
     txtCppVal = new QLineEdit();
     txtStickVal = new QLineEdit();
@@ -57,22 +65,69 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     txtStickVal->setInputMethodHints(Qt::ImhPreferNumbers);
 
     invertYCheckbox = new QCheckBox(this);
-    invertYCheckbox->setFocusPolicy(Qt::NoFocus);
     invertYCppCheckbox = new QCheckBox(this);
-    invertYCppCheckbox->setFocusPolicy(Qt::NoFocus);
     swapSticksCheckbox = new QCheckBox(this);
-    swapSticksCheckbox->setFocusPolicy(Qt::NoFocus);
-    mhCameraCheckbox = new QCheckBox(this);
-    mhCameraCheckbox->setFocusPolicy(Qt::NoFocus);
-    rsSmashCheckbox = new QCheckBox(this);
-    rsSmashCheckbox->setFocusPolicy(Qt::NoFocus);
-    rsFaceButtonsCheckbox = new QCheckBox();
-    rsFaceButtonsCheckbox->setFocusPolicy(Qt::NoFocus);
     disableCStickCheckbox = new QCheckBox();
-    disableCStickCheckbox->setFocusPolicy(Qt::NoFocus);
+    mhCameraCheckbox = new QCheckBox(this);
+    rsSmashCheckbox = new QCheckBox(this);
+    rsFaceButtonsCheckbox = new QCheckBox();
 
-    saveButton = new QPushButton(tr("&SAVE 💾"), this);
-    saveButton->setFocusPolicy(Qt::NoFocus);
+    invertYCheckbox->setChecked(profileSettings.value("Misc/invertY", false).toBool());
+    invertYCppCheckbox->setChecked(profileSettings.value("Misc/invertCPPY", false).toBool());
+    swapSticksCheckbox->setChecked(profileSettings.value("Misc/swapSticks", false).toBool());
+    disableCStickCheckbox->setChecked(profileSettings.value("Misc/cStickDisable", false).toBool());
+    mhCameraCheckbox->setChecked(profileSettings.value("RightStick/monsterHunterCamera", false).toBool());
+    rsSmashCheckbox->setChecked(profileSettings.value("RightStick/rightStickSmash", false).toBool());
+    rsFaceButtonsCheckbox->setChecked(profileSettings.value("RightStick/rightStickABXY", false).toBool());
+
+    configNameEdit = new QLineEdit(this);
+    configNameEdit->setClearButtonEnabled(true);
+    configNameEdit->setText(profileSettings.value("ButtonConfig/Name", "Default").toString());
+
+    profileSettings.endGroup();
+
+    applyButton = new QPushButton(tr("&APPLY"), this);
+    saveAsButton = new QPushButton(tr("&SAVE AS"), this);
+    saveAsButton->setEnabled(false);
+    loadButton = new QPushButton(tr("&LOAD"), this);
+    loadButton->setEnabled(false);
+    deleteButton = new QPushButton(tr("&DELETE"), this);
+
+    if (buttonProfile == "Default"){
+        applyButton->setEnabled(false);
+        deleteButton->setEnabled(false);
+    }
+
+    comboBoxPowerLong->setFocusPolicy(Qt::NoFocus);
+    comboBoxPower->setFocusPolicy(Qt::NoFocus);
+    comboBoxHome->setFocusPolicy(Qt::NoFocus);
+    comboBoxZR->setFocusPolicy(Qt::NoFocus);
+    comboBoxZL->setFocusPolicy(Qt::NoFocus);
+    comboBoxStart->setFocusPolicy(Qt::NoFocus);
+    comboBoxSelect->setFocusPolicy(Qt::NoFocus);
+    comboBoxR->setFocusPolicy(Qt::NoFocus);
+    comboBoxL->setFocusPolicy(Qt::NoFocus);
+    comboBoxRight->setFocusPolicy(Qt::NoFocus);
+    comboBoxLeft->setFocusPolicy(Qt::NoFocus);
+    comboBoxDown->setFocusPolicy(Qt::NoFocus);
+    comboBoxUp->setFocusPolicy(Qt::NoFocus);
+    comboBoxY->setFocusPolicy(Qt::NoFocus);
+    comboBoxX->setFocusPolicy(Qt::NoFocus);
+    comboBoxB->setFocusPolicy(Qt::NoFocus);
+    comboBoxA->setFocusPolicy(Qt::NoFocus);
+
+    disableCStickCheckbox->setFocusPolicy(Qt::NoFocus);
+    rsFaceButtonsCheckbox->setFocusPolicy(Qt::NoFocus);
+    rsSmashCheckbox->setFocusPolicy(Qt::NoFocus);
+    mhCameraCheckbox->setFocusPolicy(Qt::NoFocus);
+    swapSticksCheckbox->setFocusPolicy(Qt::NoFocus);
+    invertYCppCheckbox->setFocusPolicy(Qt::NoFocus);
+    invertYCheckbox->setFocusPolicy(Qt::NoFocus);
+
+    applyButton->setFocusPolicy(Qt::NoFocus);
+    saveAsButton->setFocusPolicy(Qt::NoFocus);
+    loadButton->setFocusPolicy(Qt::NoFocus);
+    deleteButton->setFocusPolicy(Qt::NoFocus);
 
     layout = new QGridLayout(this);
 
@@ -135,209 +190,64 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     layout->addWidget(new QLabel("RS as ABXY"), 19, 2);
     layout->addWidget(rsFaceButtonsCheckbox, 19, 3);
 
-    layout->addWidget(saveButton, 21, 1, 1, 2);
+    layout->addWidget(applyButton, 21, 1, 1, 2);
 
-    connect(invertYCheckbox, &QCheckBox::stateChanged, this,
-            [](int state)
-    {
-        switch(state)
-        {
-            case Qt::Unchecked:
-                yAxisMultiplier = 1;
-                settings.setValue("invertY", false);
-                break;
-            case Qt::Checked:
-                yAxisMultiplier = -1;
-                settings.setValue("invertY", true);
-                break;
-            default: break;
-        }
-    });
+    layout->addWidget(saveAsButton, 22, 2, 1, 2);
+    layout->addWidget(configNameEdit, 22, 0, 1, 2);
 
-    connect(invertYCppCheckbox, &QCheckBox::stateChanged, this,
-            [](int state)
-    {
-        switch(state)
-        {
-            case Qt::Unchecked:
-                yAxisMultiplierCpp = 1;
-                settings.setValue("invertCPPY", false);
-                break;
-            case Qt::Checked:
-                yAxisMultiplierCpp = -1;
-                settings.setValue("invertCPPY", true);
-                break;
-            default: break;
-        }
-    });
+    layout->addWidget(comboBoxProfiles, 23, 1, 1, 2);
+    layout->addWidget(loadButton, 23, 0, 1, 1);
+    layout->addWidget(deleteButton, 23, 3, 1, 1);
 
-
-    connect(swapSticksCheckbox, &QCheckBox::stateChanged, this,
-            [](int state)
-    {
-        switch(state)
-        {
-            case Qt::Unchecked:
-                btnSettings.setShouldSwapStick(false);
-                settings.setValue("swapSticks", false);
-                break;
-            case Qt::Checked:
-                btnSettings.setShouldSwapStick(true);
-                settings.setValue("swapSticks", true);
-                break;
-            default: break;
-        }
-
-    });
-
-    connect(rsSmashCheckbox, &QCheckBox::stateChanged, this,
-            [](int state)
-    {
-         switch(state)
-         {
-             case Qt::Unchecked:
-                 btnSettings.setRightStickSmash(false);
-                 settings.setValue("rightStickSmash", false);
-                 break;
-             case Qt::Checked:
-                 btnSettings.setRightStickSmash(true);
-                 settings.setValue("rightStickSmash", true);
-                 break;
-             default: break;
-         }
-
-     });
-
-    connect(mhCameraCheckbox, &QCheckBox::stateChanged, this,
-            [](int state)
-    {
-        switch(state)
-        {
-            case Qt::Unchecked:
-                btnSettings.setMonsterHunterCamera(false);
-                settings.setValue("monsterHunterCamera", false);
-                break;
-            case Qt::Checked:
-                btnSettings.setMonsterHunterCamera(true);
-                settings.setValue("monsterHunterCamera", true);
-                break;
-            default: break;
-        }
-    });
-    connect(disableCStickCheckbox, &QCheckBox::stateChanged, this,
-            [](int state)
-    {
-        switch(state)
-        {
-            case Qt::Unchecked:
-                btnSettings.setCStickDisabled(false);
-                settings.setValue("cStickDisable", false);
-                break;
-            case Qt::Checked:
-                btnSettings.setCStickDisabled(true);
-                settings.setValue("cStickDisable", true);
-                break;
-            default: break;
-        }
-    });
-    connect(rsFaceButtonsCheckbox, &QCheckBox::stateChanged, this,
-            [](int state)
-    {
-        switch(state)
-        {
-            case Qt::Unchecked:
-                btnSettings.setRightStickFaceButtons(false);
-                settings.setValue("rightStickABXY", false);
-                break;
-            case Qt::Checked:
-                btnSettings.setRightStickFaceButtons(true);
-                settings.setValue("rightStickABXY", true);
-                break;
-            default: break;
-        }
-    });
-
-    connect(saveButton, &QPushButton::pressed, this,
+    connect(applyButton, &QPushButton::pressed, this,
             [this, ts](void)
     {
-        QGamepadManager::GamepadButton a = variantToButton(currentData(comboBoxA));
-        hidButtonsAB[0] = a;
-        settings.setValue("ButtonA", a);
-        QGamepadManager::GamepadButton b = variantToButton(currentData(comboBoxB));
-        hidButtonsAB[1] = b;
-        settings.setValue("ButtonB", b);
-
-        QGamepadManager::GamepadButton select = variantToButton(currentData(comboBoxSelect));
-        hidButtonsMiddle[0] = select;
-        settings.setValue("ButtonSelect", select);
-        QGamepadManager::GamepadButton start = variantToButton(currentData(comboBoxStart));
-        hidButtonsMiddle[1] = start;
-        settings.setValue("ButtonStart", start);
-        QGamepadManager::GamepadButton right = variantToButton(currentData(comboBoxRight));
-        hidButtonsMiddle[2] = right;
-        settings.setValue("ButtonRight", right);
-        QGamepadManager::GamepadButton left = variantToButton(currentData(comboBoxLeft));
-        hidButtonsMiddle[3] = left;
-        settings.setValue("ButtonLeft", left);
-        QGamepadManager::GamepadButton up = variantToButton(currentData(comboBoxUp));
-        hidButtonsMiddle[4] = up;
-        settings.setValue("ButtonUp", up);
-        QGamepadManager::GamepadButton down = variantToButton(currentData(comboBoxDown));
-        hidButtonsMiddle[5] = down;
-        settings.setValue("ButtonDown", down);
-        QGamepadManager::GamepadButton r = variantToButton(currentData(comboBoxR));
-        hidButtonsMiddle[6] = r;
-        settings.setValue("ButtonR", r);
-        QGamepadManager::GamepadButton l = variantToButton(currentData(comboBoxL));
-        hidButtonsMiddle[7] = l;
-        settings.setValue("ButtonL", l);
-
-        QGamepadManager::GamepadButton x = variantToButton(currentData(comboBoxX));
-        hidButtonsXY[0] = x;
-        settings.setValue("ButtonX", x);
-        QGamepadManager::GamepadButton y = variantToButton(currentData(comboBoxY));
-        hidButtonsXY[1] = y;
-        settings.setValue("ButtonY", y);
-
-        QGamepadManager::GamepadButton zr = variantToButton(currentData(comboBoxZR));
-        irButtons[0] = zr;
-        settings.setValue("ButtonZR", zr);
-        QGamepadManager::GamepadButton zl = variantToButton(currentData(comboBoxZL));
-        irButtons[1] = zl;
-        settings.setValue("ButtonZL", zl);
-
-        QGamepadManager::GamepadButton power = variantToButton(currentData(comboBoxPower));
-        powerButton = power;
-        settings.setValue("ButtonPower", power);
-        QGamepadManager::GamepadButton powerLong = variantToButton(currentData(comboBoxPowerLong));
-        powerLongButton = powerLong;
-        settings.setValue("ButtonPowerLong", powerLong);
-        QGamepadManager::GamepadButton home = variantToButton(currentData(comboBoxHome));
-        homeButton = home;
-        settings.setValue("ButtonHome", home);
-
-        CPP_BOUND = txtCppVal->text().toInt();
-        CPAD_BOUND = txtStickVal->text().toInt();
-        settings.setValue("StickBound", CPAD_BOUND);
-        settings.setValue("CppBound", CPP_BOUND);
-
-        ts->updatePixmap();
-
+        applySettings();
     });
 
-    connect(saveButton, &QPushButton::released, this,
+    connect(configNameEdit, &QLineEdit::textChanged, this,
+            [this](const QString &text)
+    {
+        QString toCheck = text.simplified();
+        saveAsButton->setEnabled(toCheck != buttonProfile && toCheck != "Default" && toCheck != "");
+    });
+
+    connect(saveAsButton, &QPushButton::pressed, this,
             [this](void)
     {
-        this->hide();
+       QString newName = configNameEdit->text();
+       buttonProfile = newName.simplified();
+       profileSettings.setValue(buttonProfile+"/ButtonConfig/Name", newName);
+       applySettings();
+       settings.setValue("InputRedirection/ButtonConfig", newName);
+
+       comboBoxProfiles->addItem(buttonProfile);
+       comboBoxProfiles->setCurrentIndex(comboBoxProfiles->findText(buttonProfile));
+       applyButton->setEnabled(true);
+       saveAsButton->setEnabled(false);
     });
 
-    invertYCheckbox->setChecked(settings.value("invertY", false).toBool());
-    invertYCppCheckbox->setChecked(settings.value("invertCPPY", false).toBool());
-    swapSticksCheckbox->setChecked(settings.value("swapSticks", false).toBool());
-    mhCameraCheckbox->setChecked(settings.value("monsterHunterCamera", false).toBool());
-    rsSmashCheckbox->setChecked(settings.value("rightStickSmash", false).toBool());
-    disableCStickCheckbox->setChecked(settings.value("cStickDisable", false).toBool());
-    rsFaceButtonsCheckbox->setChecked(settings.value("rightStickABXY", false).toBool());
+    connect(comboBoxProfiles, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            [this](void)
+    {
+        QString currentSelection = comboBoxProfiles->currentText();
+        loadButton->setEnabled(buttonProfile != currentSelection);
+        deleteButton->setEnabled(currentSelection != "Default");
+    });
+
+    connect(loadButton, &QPushButton::pressed, this,
+            [this](void)
+    {
+       loadSettings();
+    });
+
+    connect(deleteButton, &QPushButton::pressed, this,
+            [this](void)
+    {
+       deleteProfile();
+    });
+
+    applySettings();
 }
 
 QComboBox* ConfigWindow::populateItems(QGamepadManager::GamepadButton button)
@@ -368,6 +278,12 @@ QComboBox* ConfigWindow::populateItems(QGamepadManager::GamepadButton button)
     return comboBox;
 }
 
+void ConfigWindow::setIndexFromValue(QComboBox *comboBox, QVariant value)
+{
+    int index = comboBox->findData(value);
+    comboBox->setCurrentIndex(index);
+}
+
 QVariant ConfigWindow::currentData(QComboBox *comboBox)
 {
     QVariant variant;
@@ -375,4 +291,169 @@ QVariant ConfigWindow::currentData(QComboBox *comboBox)
     variant = comboBox->itemData(comboBox->currentIndex());
 
     return variant;
+}
+
+void ConfigWindow::applySettings(void)
+{
+    profileSettings.beginGroup(buttonProfile);
+
+    QGamepadManager::GamepadButton a = variantToButton(currentData(comboBoxA));
+    hidButtonsAB[0] = a;
+    profileSettings.setValue("3DS/A", a);
+    QGamepadManager::GamepadButton b = variantToButton(currentData(comboBoxB));
+    hidButtonsAB[1] = b;
+    profileSettings.setValue("3DS/B", b);
+    QGamepadManager::GamepadButton x = variantToButton(currentData(comboBoxX));
+    hidButtonsXY[0] = x;
+    profileSettings.setValue("3DS/X", x);
+    QGamepadManager::GamepadButton y = variantToButton(currentData(comboBoxY));
+    hidButtonsXY[1] = y;
+    profileSettings.setValue("3DS/Y", y);
+
+    QGamepadManager::GamepadButton right = variantToButton(currentData(comboBoxRight));
+    hidButtonsMiddle[2] = right;
+    profileSettings.setValue("3DS/Right", right);
+    QGamepadManager::GamepadButton left = variantToButton(currentData(comboBoxLeft));
+    hidButtonsMiddle[3] = left;
+    profileSettings.setValue("3DS/Left", left);
+    QGamepadManager::GamepadButton up = variantToButton(currentData(comboBoxUp));
+    hidButtonsMiddle[4] = up;
+    profileSettings.setValue("3DS/Up", up);
+    QGamepadManager::GamepadButton down = variantToButton(currentData(comboBoxDown));
+    hidButtonsMiddle[5] = down;
+    profileSettings.setValue("3DS/Down", down);
+
+    QGamepadManager::GamepadButton r = variantToButton(currentData(comboBoxR));
+    hidButtonsMiddle[6] = r;
+    profileSettings.setValue("3DS/R", r);
+    QGamepadManager::GamepadButton l = variantToButton(currentData(comboBoxL));
+    hidButtonsMiddle[7] = l;
+    profileSettings.setValue("3DS/L", l);
+
+    QGamepadManager::GamepadButton select = variantToButton(currentData(comboBoxSelect));
+    hidButtonsMiddle[0] = select;
+    profileSettings.setValue("3DS/Select", select);
+    QGamepadManager::GamepadButton start = variantToButton(currentData(comboBoxStart));
+    hidButtonsMiddle[1] = start;
+    profileSettings.setValue("3DS/Start", start);
+
+    QGamepadManager::GamepadButton zr = variantToButton(currentData(comboBoxZR));
+    irButtons[0] = zr;
+    profileSettings.setValue("3DS/ZR", zr);
+    QGamepadManager::GamepadButton zl = variantToButton(currentData(comboBoxZL));
+    irButtons[1] = zl;
+    profileSettings.setValue("3DS/ZL", zl);
+
+    QGamepadManager::GamepadButton power = variantToButton(currentData(comboBoxPower));
+    powerButton = power;
+    profileSettings.setValue("3DS/Power", power);
+
+    QGamepadManager::GamepadButton powerLong = variantToButton(currentData(comboBoxPowerLong));
+    powerLongButton = powerLong;
+    profileSettings.setValue("3DS/PowerLong", powerLong);
+
+    QGamepadManager::GamepadButton home = variantToButton(currentData(comboBoxHome));
+    homeButton = home;
+    profileSettings.setValue("3DS/Home", home);
+
+    bool invy = invertYCheckbox->isChecked();
+    yAxisMultiplier = (invy) ? -1 : 1;
+    profileSettings.setValue("Misc/InvertY", invy);
+
+    bool invcy = invertYCppCheckbox->isChecked();
+    yAxisMultiplierCpp = (invcy) ? -1 : 1;
+    profileSettings.setValue("Misc/InvertCPPY", invcy);
+
+    bool swap = swapSticksCheckbox->isChecked();
+    btnSettings.setShouldSwapStick(swap);
+    profileSettings.setValue("Misc/SwapSticks", swap);
+
+    bool rssmash = rsSmashCheckbox->isChecked();
+    btnSettings.setRightStickSmash(rssmash);
+    profileSettings.setValue("RightStick/Smash", rssmash);
+
+    bool rsabxy = rsFaceButtonsCheckbox->isChecked();
+    btnSettings.setRightStickFaceButtons(rsabxy);
+    profileSettings.setValue("RightStick/ABXY", rsabxy);
+
+    bool rsdpad = mhCameraCheckbox->isChecked();
+    btnSettings.setMonsterHunterCamera(rsdpad);
+    profileSettings.setValue("RightStick/DPad", rsdpad);
+
+    bool disablec = disableCStickCheckbox->isChecked();
+    btnSettings.setCStickDisabled(disablec);
+    profileSettings.setValue("Misc/DisableC", disablec);
+
+    CPP_BOUND = txtCppVal->text().toInt();
+    CPAD_BOUND = txtStickVal->text().toInt();
+    profileSettings.setValue("3DS/StickBound", CPAD_BOUND);
+    profileSettings.setValue("3DS/CppBound", CPP_BOUND);
+
+    profileSettings.endGroup();
+
+    touchScreen->updatePixmap();
+}
+
+void ConfigWindow::loadSettings(void)
+{
+    buttonProfile = comboBoxProfiles->currentText();
+
+    profileSettings.beginGroup(buttonProfile);
+
+    setIndexFromValue(comboBoxA, variantToButton(profileSettings.value("3DS/A", QGamepadManager::ButtonA)));
+    setIndexFromValue(comboBoxB, variantToButton(profileSettings.value("3DS/B", QGamepadManager::ButtonB)));
+    setIndexFromValue(comboBoxX, variantToButton(profileSettings.value("3DS/X", QGamepadManager::ButtonX)));
+    setIndexFromValue(comboBoxY, variantToButton(profileSettings.value("3DS/Y", QGamepadManager::ButtonY)));
+    setIndexFromValue(comboBoxUp, variantToButton(profileSettings.value("3DS/Up", QGamepadManager::ButtonUp)));
+    setIndexFromValue(comboBoxDown, variantToButton(profileSettings.value("3DS/Down", QGamepadManager::ButtonDown)));
+    setIndexFromValue(comboBoxLeft, variantToButton(profileSettings.value("3DS/Left", QGamepadManager::ButtonLeft)));
+    setIndexFromValue(comboBoxRight, variantToButton(profileSettings.value("3DS/Right", QGamepadManager::ButtonRight)));
+    setIndexFromValue(comboBoxL, variantToButton(profileSettings.value("3DS/L", QGamepadManager::ButtonL1)));
+    setIndexFromValue(comboBoxR, variantToButton(profileSettings.value("3DS/R", QGamepadManager::ButtonR1)));
+    setIndexFromValue(comboBoxSelect, variantToButton(profileSettings.value("3DS/Select", QGamepadManager::ButtonSelect)));
+    setIndexFromValue(comboBoxStart, variantToButton(profileSettings.value("3DS/Start", QGamepadManager::ButtonStart)));
+    setIndexFromValue(comboBoxZL, variantToButton(profileSettings.value("3DS/ZL", QGamepadManager::ButtonL2)));
+    setIndexFromValue(comboBoxZR, variantToButton(profileSettings.value("3DS/ZR", QGamepadManager::ButtonR2)));
+    setIndexFromValue(comboBoxHome, variantToButton(profileSettings.value("3DS/Home", QGamepadManager::ButtonInvalid)));
+    setIndexFromValue(comboBoxPower, variantToButton(profileSettings.value("3DS/Power", QGamepadManager::ButtonInvalid)));
+    setIndexFromValue(comboBoxPowerLong, variantToButton(profileSettings.value("3DS/PowerLong", QGamepadManager::ButtonInvalid)));
+
+    configNameEdit->setText(buttonProfile);
+
+    invertYCheckbox->setChecked(profileSettings.value("Misc/InvertY", false).toBool());
+    invertYCppCheckbox->setChecked(profileSettings.value("Misc/InvertCPPY", false).toBool());
+    swapSticksCheckbox->setChecked(profileSettings.value("Misc/SwapSticks", false).toBool());
+    mhCameraCheckbox->setChecked(profileSettings.value("RightStick/DPad", false).toBool());
+    rsSmashCheckbox->setChecked(profileSettings.value("RightStick/Smash", false).toBool());
+    disableCStickCheckbox->setChecked(profileSettings.value("Misc/DisableC", false).toBool());
+    rsFaceButtonsCheckbox->setChecked(profileSettings.value("RightStick/ABXY", false).toBool());
+
+    txtCppVal->setText(profileSettings.value("3DS/CppBound", 127).toString());
+    txtStickVal->setText(profileSettings.value("3DS/StickBound", 1488).toString());
+
+    profileSettings.endGroup();
+
+    applySettings();
+    settings.setValue("InputRedirection/ButtonConfig", buttonProfile);
+    touchScreen->tsShortcutGui.loadNewShortcuts();
+
+    applyButton->setEnabled(buttonProfile != "Default");
+    loadButton->setEnabled(false);
+}
+
+void ConfigWindow::deleteProfile(void)
+{
+    QString toDelete = comboBoxProfiles->currentText();
+
+    comboBoxProfiles->setCurrentIndex(comboBoxProfiles->findText("Default"));
+    comboBoxProfiles->removeItem(comboBoxProfiles->findText(toDelete));
+
+    profileSettings.remove(toDelete);
+
+    if (buttonProfile == toDelete)
+    {
+        buttonProfile = "Default";
+        settings.setValue("InputRedirection/ButtonConfig", buttonProfile);
+        loadSettings();
+    }
 }

@@ -14,20 +14,31 @@ private:
                 *comboBoxUp, *comboBoxDown, *comboBoxLeft,
                 *comboBoxRight, *comboBoxStart, *comboBoxSelect,
                 *comboBoxZL, *comboBoxZR, *comboBoxHome,
-                *comboBoxPower, *comboBoxPowerLong;
+                *comboBoxPower, *comboBoxPowerLong, *comboBoxProfiles;
 
-    QPushButton *saveButton;
+    QPushButton *applyButton, *saveAsButton, *loadButton, *deleteButton, *saveButton;
 
     QCheckBox   *invertYCheckbox, *invertYCppCheckbox, *swapSticksCheckbox,
                 *mhCameraCheckbox, *rsSmashCheckbox,
                 *disableCStickCheckbox, *rsFaceButtonsCheckbox;
 
-    QComboBox* populateItems(QGamepadManager::GamepadButton button);
+    QLineEdit *txtStickVal, *txtCppVal, *configNameEdit;
 
-    QLineEdit *txtStickVal, *txtCppVal;
     QValidator *validator;
 
+    TouchScreen * touchScreen;
+
+    QComboBox* populateItems(QGamepadManager::GamepadButton button);    
+
     QVariant currentData(QComboBox *comboBox);
+
+    void setIndexFromValue(QComboBox *comboBox, QVariant value);
+
+    void applySettings(void);
+
+    void loadSettings(void);
+
+    void deleteProfile(void);
 
 public:
     ConfigWindow(QWidget *parent = nullptr, TouchScreen *ts = nullptr);

@@ -2,7 +2,9 @@
 #include <math.h>
 #include "gpmanager.h"
 
-QSettings settings("TuxSH", "InputRedirectionClient-Qt");
+QSettings settings("InputRedirection.ini", QSettings::IniFormat);
+QSettings profileSettings("ButtonConfig.ini", QSettings::IniFormat);
+QString buttonProfile = settings.value("InputRedirection/ButtonConfig", "Default").toString();
 
 Worker* worker;
 Settings btnSettings;
@@ -14,8 +16,8 @@ QGamepadManager::GamepadButtons buttons = 0;
 u32 interfaceButtons = 0;
 int yAxisMultiplier = 1, yAxisMultiplierCpp = 1;
 bool shouldSwapStick = false;
-int CPAD_BOUND = (settings.contains("StickBound") ? settings.value("StickBound").toInt() : 1488);
-int CPP_BOUND = (settings.contains("CppBound") ? settings.value("CppBound").toInt() : 127);
+int CPAD_BOUND = (profileSettings.value(buttonProfile+"/3DS/StickBound").toInt(), 1488);
+int CPP_BOUND = (profileSettings.value(buttonProfile+"/3DS/CppBound").toInt(), 127);
 
 GamepadConfigurator *gpConfigurator;
 
@@ -25,34 +27,34 @@ bool touchScreenPressed;
 QSize touchScreenSize = QSize(TOUCH_SCREEN_WIDTH, TOUCH_SCREEN_HEIGHT);
 QPoint touchScreenPosition;
 
-QGamepadManager::GamepadButton homeButton
-    = variantToButton(settings.value("ButtonHome", QGamepadManager::ButtonInvalid));
-QGamepadManager::GamepadButton powerButton
-    = variantToButton(settings.value("ButtonPower", QGamepadManager::ButtonInvalid));
-QGamepadManager::GamepadButton powerLongButton
-    = variantToButton(settings.value("ButtonPowerLong", QGamepadManager::ButtonInvalid));
+QGamepadManager::GamepadButton homeButton =
+    variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonHome", QGamepadManager::ButtonInvalid));
+QGamepadManager::GamepadButton powerButton =
+    variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonPower", QGamepadManager::ButtonInvalid));
+QGamepadManager::GamepadButton powerLongButton =
+    variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonPowerLong", QGamepadManager::ButtonInvalid));
 
-QGamepadManager::GamepadButton hidButtonsAB[2]={
-variantToButton(settings.value("ButtonA", QGamepadManager::ButtonA)),
-variantToButton(settings.value("ButtonB", QGamepadManager::ButtonB))};
+QGamepadManager::GamepadButton hidButtonsAB[2] = {
+    variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonA", QGamepadManager::ButtonA)),
+    variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonB", QGamepadManager::ButtonB))};
 
-QGamepadManager::GamepadButton hidButtonsMiddle[8] ={
-variantToButton(settings.value("ButtonSelect", QGamepadManager::ButtonSelect)),
-variantToButton(settings.value("ButtonStart", QGamepadManager::ButtonStart)),
-variantToButton(settings.value("ButtonRight", QGamepadManager::ButtonRight)),
-variantToButton(settings.value("ButtonLeft", QGamepadManager::ButtonLeft)),
-variantToButton(settings.value("ButtonUp", QGamepadManager::ButtonUp)),
-variantToButton(settings.value("ButtonDown", QGamepadManager::ButtonDown)),
-variantToButton(settings.value("ButtonR", QGamepadManager::ButtonR1)),
-variantToButton(settings.value("ButtonL", QGamepadManager::ButtonL1))};
+QGamepadManager::GamepadButton hidButtonsMiddle[8] = {
+    variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonSelect", QGamepadManager::ButtonSelect)),
+    variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonStart", QGamepadManager::ButtonStart)),
+    variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonRight", QGamepadManager::ButtonRight)),
+    variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonLeft", QGamepadManager::ButtonLeft)),
+    variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonUp", QGamepadManager::ButtonUp)),
+    variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonDown", QGamepadManager::ButtonDown)),
+    variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonR", QGamepadManager::ButtonR1)),
+    variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonL", QGamepadManager::ButtonL1))};
 
 QGamepadManager::GamepadButton hidButtonsXY[2] = {
-    variantToButton(settings.value("ButtonX", QGamepadManager::ButtonX)),
-    variantToButton(settings.value("ButtonY", QGamepadManager::ButtonY))};
+    variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonX", QGamepadManager::ButtonX)),
+    variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonY", QGamepadManager::ButtonY))};
 
 QGamepadManager::GamepadButton irButtons[2] = {
-    variantToButton(settings.value("ButtonZR", QGamepadManager::ButtonR2)),
-    variantToButton(settings.value("ButtonZL", QGamepadManager::ButtonL2))};
+    variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonZR", QGamepadManager::ButtonR2)),
+    variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonZL", QGamepadManager::ButtonL2))};
 
 
 void Worker::setLeftAxis(double x, double y)
