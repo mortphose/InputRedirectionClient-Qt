@@ -192,22 +192,24 @@ void TouchScreen::paintEvent(QPaintEvent* e)
         newPic.fill(Qt::transparent);
     }
 
-
     QPainter painter;
     painter.begin(&newPic);
-    painter.setBrush(QBrush(Qt::black));
+    QPen pen;
+    pen.setWidth(2);
+    //painter.setBrush(QBrush(Qt::black));
+    pen.setColor(Qt::black);
     painter.setRenderHint(QPainter::Antialiasing, true);
 
-     for (unsigned i=0; i<listShortcuts.size(); ++i)
-     {
+    for (unsigned i = 0; i < listShortcuts.size(); ++i)
+    {
         ShortCut curShort = listShortcuts[i];
-
-             painter.setBrush(QBrush(curShort.color));
-             painter.drawEllipse(TOUCH_SCREEN_WIDTH*((this->height()*curShort.pos.x())/TOUCH_SCREEN_HEIGHT)/this->width(),
-                                 TOUCH_SCREEN_HEIGHT*((this->width()*curShort.pos.y())/TOUCH_SCREEN_WIDTH)/this->height(),
-                                 (3*this->width())/TOUCH_SCREEN_WIDTH,
-                                 (3*this->height())/TOUCH_SCREEN_HEIGHT);
-
+        //pen.setColor(curShort.color);
+        painter.setBrush(QBrush(curShort.color));
+        painter.setPen(pen);
+        painter.drawEllipse(
+            TOUCH_SCREEN_WIDTH*((height()*curShort.pos.x())/TOUCH_SCREEN_HEIGHT)/width(),
+            TOUCH_SCREEN_HEIGHT*((width()*curShort.pos.y())/TOUCH_SCREEN_WIDTH)/height(),
+            7, 7);
     }
 
      bgLabel->setPixmap(newPic);
