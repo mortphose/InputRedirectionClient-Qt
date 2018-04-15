@@ -35,6 +35,21 @@ bool Settings::isCStickDisabled()
     return cStickDisabled;
 }
 
+bool Settings::isSamusReturnsAiming()
+{
+    return samusReturnsAiming;
+}
+
+bool Settings::isSamusAimingV()
+{
+    return samusAimingV;
+}
+
+bool Settings::isSamusAimingH()
+{
+    return samusAimingH;
+}
+
 /***SETTERS***/
 void Settings::setShouldSwapStick(bool b)
 {
@@ -69,4 +84,19 @@ void Settings::setRightStickFaceButtons(bool b)
 void Settings::setCStickDisabled(bool b)
 {
     cStickDisabled = b;
+}
+
+void Settings::setSamusReturnsAiming(bool b)
+{
+    samusReturnsAiming = b;
+}
+
+void Settings::setSamusAimingV(bool b)
+{
+    samusAimingV = b;
+}
+
+void Settings::setSamusAimingH(bool b)
+{
+    samusAimingH = b;
 }

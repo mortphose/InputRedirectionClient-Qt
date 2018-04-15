@@ -20,7 +20,7 @@ private:
 
     QCheckBox   *invertYCheckbox, *invertYCppCheckbox, *swapSticksCheckbox,
                 *mhCameraCheckbox, *rsSmashCheckbox,
-                *disableCStickCheckbox, *rsFaceButtonsCheckbox;
+                *disableCStickCheckbox, *rsFaceButtonsCheckbox, *rsSamusReturnsCheckbox;
 
     QLineEdit *txtStickVal, *txtCppVal, *configNameEdit;
 

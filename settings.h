@@ -11,6 +11,9 @@ class Settings
     bool smashingH;
     bool rightStickFaceButtons;
     bool cStickDisabled;
+    bool samusReturnsAiming;
+    bool samusAimingV;
+    bool samusAimingH;
 
  public:
     Settings()
@@ -25,6 +28,9 @@ class Settings
     bool isSmashingH();
     bool isRightStickFaceButtons();
     bool isCStickDisabled();
+    bool isSamusReturnsAiming();
+    bool isSamusAimingV();
+    bool isSamusAimingH();
 
 
     void setShouldSwapStick(bool);
@@ -34,6 +40,9 @@ class Settings
     void setSmashingH(bool);
     void setRightStickFaceButtons(bool);
     void setCStickDisabled(bool);
+    void setSamusReturnsAiming(bool);
+    void setSamusAimingV(bool);
+    void setSamusAimingH(bool);
 };
 
 #endif // SETTINGS_H

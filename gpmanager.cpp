@@ -89,18 +89,40 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
         if(axis==axLeftX)
         {
            worker->setLeftAxis(value, worker->getLeftAxis().y);
-           worker->setPreviousLAxis(worker->getLeftAxis().x, worker->getPreviousLAxis().y);
+           if (!btnSettings.isSamusAimingH() && !btnSettings.isSamusAimingV())
+                worker->setPreviousLAxis(worker->getLeftAxis().x, worker->getPreviousLAxis().y);
         }
         else
         if(axis==axLeftY)
         {
             worker->setLeftAxis(worker->getLeftAxis().x, yAxisMultiplier * -value); // for some reason qt inverts this
-            worker->setPreviousLAxis(worker->getPreviousLAxis().x, worker->getLeftAxis().y);
+            if (!btnSettings.isSamusAimingH() && !btnSettings.isSamusAimingV())
+                worker->setPreviousLAxis(worker->getPreviousLAxis().x, worker->getLeftAxis().y);
         }
         else
         if(axis==axRightX)
         {
             if (!btnSettings.isCStickDisabled()) worker->setRightAxis(value, worker->getRightAxis().y);
+
+            if (btnSettings.isSamusReturnsAiming())
+            {
+                if ((value > -1.2 && value < -0.05) || (value > 0.05 && value < 1.2)) // RS tilted left
+                {
+                    btnSettings.setSamusAimingH(true);
+                    buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsMiddle[7]); // press L
+                    worker->setLeftAxis(value, worker->getLeftAxis().y);
+                } else { // RS neutral, release buttons
+                    if (btnSettings.isSamusAimingH())
+                    {
+                        if (!btnSettings.isSamusAimingV())
+                        {
+                            buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsMiddle[7])); // Release L
+                        worker->setLeftAxis(worker->getPreviousLAxis().x-0.01, worker->getPreviousLAxis().y-0.01);
+                        }
+                        btnSettings.setSamusAimingH(false);
+                    }
+                }
+            }
 
             if (btnSettings.isMonsterHunterCamera())
             {
@@ -155,6 +177,28 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
         if(axis==axRightY)
         {
             worker->setRightAxis(worker->getRightAxis().x, yAxisMultiplierCpp * -value);
+
+            if (btnSettings.isSamusReturnsAiming())
+            {
+                if ((worker->getRightAxis().y > -1.2 && worker->getRightAxis().y < -0.05) ||
+                        (worker->getRightAxis().y > 0.05 && worker->getRightAxis().y < 1.2)) // RS tilted down
+                {
+                    btnSettings.setSamusAimingV(true);
+                    buttons |= QGamepadManager::GamepadButtons(1 << hidButtonsMiddle[7]); // press A
+                    worker->setLeftAxis(worker->getLeftAxis().x, worker->getRightAxis().y);
+                } else { // RS neutral, release button A
+                    if (btnSettings.isSamusAimingV())
+                    {
+                        if (!btnSettings.isSamusAimingH())
+                        {
+                            buttons &= QGamepadManager::GamepadButtons(~(1 << hidButtonsMiddle[7])); // Release A
+                        worker->setLeftAxis(worker->getLeftAxis().x-0.01, worker->getPreviousLAxis().y-0.01);
+                        }
+                        btnSettings.setSamusAimingV(false);
+                    }
+                }
+
+            }
 
             if (btnSettings.isMonsterHunterCamera())
             {

@@ -71,14 +71,16 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     mhCameraCheckbox = new QCheckBox(this);
     rsSmashCheckbox = new QCheckBox(this);
     rsFaceButtonsCheckbox = new QCheckBox();
+    rsSamusReturnsCheckbox = new QCheckBox();
 
     invertYCheckbox->setChecked(profileSettings.value("Misc/invertY", false).toBool());
     invertYCppCheckbox->setChecked(profileSettings.value("Misc/invertCPPY", false).toBool());
     swapSticksCheckbox->setChecked(profileSettings.value("Misc/swapSticks", false).toBool());
-    disableCStickCheckbox->setChecked(profileSettings.value("Misc/cStickDisable", false).toBool());
+    disableCStickCheckbox->setChecked(profileSettings.value("Misc/DisableC", false).toBool());
     mhCameraCheckbox->setChecked(profileSettings.value("RightStick/monsterHunterCamera", false).toBool());
     rsSmashCheckbox->setChecked(profileSettings.value("RightStick/rightStickSmash", false).toBool());
     rsFaceButtonsCheckbox->setChecked(profileSettings.value("RightStick/rightStickABXY", false).toBool());
+    rsSamusReturnsCheckbox->setChecked(profileSettings.value("RightStick/SamusReturns", false).toBool());
 
     configNameEdit = new QLineEdit(this);
     configNameEdit->setClearButtonEnabled(true);
@@ -120,6 +122,7 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     rsFaceButtonsCheckbox->setFocusPolicy(Qt::NoFocus);
     rsSmashCheckbox->setFocusPolicy(Qt::NoFocus);
     mhCameraCheckbox->setFocusPolicy(Qt::NoFocus);
+    rsSamusReturnsCheckbox->setFocusPolicy(Qt::NoFocus);
     swapSticksCheckbox->setFocusPolicy(Qt::NoFocus);
     invertYCppCheckbox->setFocusPolicy(Qt::NoFocus);
     invertYCheckbox->setFocusPolicy(Qt::NoFocus);
@@ -189,6 +192,8 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     layout->addWidget(rsSmashCheckbox, 20, 1);
     layout->addWidget(new QLabel("RS as ABXY"), 19, 2);
     layout->addWidget(rsFaceButtonsCheckbox, 19, 3);
+    layout->addWidget(new QLabel("RS as L+Pad"), 20, 2);
+    layout->addWidget(rsSamusReturnsCheckbox, 20, 3);
 
     layout->addWidget(applyButton, 21, 1, 1, 2);
 
@@ -384,6 +389,10 @@ void ConfigWindow::applySettings(void)
     btnSettings.setCStickDisabled(disablec);
     profileSettings.setValue("Misc/DisableC", disablec);
 
+    bool rssamus = rsSamusReturnsCheckbox->isChecked();
+    btnSettings.setSamusReturnsAiming(rssamus);
+    profileSettings.setValue("RightStick/SamusReturns", rssamus);
+
     CPP_BOUND = txtCppVal->text().toInt();
     CPAD_BOUND = txtStickVal->text().toInt();
     profileSettings.setValue("3DS/StickBound", CPAD_BOUND);
@@ -427,6 +436,7 @@ void ConfigWindow::loadSettings(void)
     rsSmashCheckbox->setChecked(profileSettings.value("RightStick/Smash", false).toBool());
     disableCStickCheckbox->setChecked(profileSettings.value("Misc/DisableC", false).toBool());
     rsFaceButtonsCheckbox->setChecked(profileSettings.value("RightStick/ABXY", false).toBool());
+    rsSamusReturnsCheckbox->setChecked(profileSettings.value("RightStick/SamusReturns", false).toBool());
 
     txtCppVal->setText(profileSettings.value("3DS/CppBound", 127).toString());
     txtStickVal->setText(profileSettings.value("3DS/StickBound", 1488).toString());
