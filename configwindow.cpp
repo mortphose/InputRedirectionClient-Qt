@@ -98,7 +98,6 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     deleteButton = new QPushButton(tr("&DELETE"), this);
 
     if (buttonProfile == "Default"){
-        applyButton->setEnabled(false);
         deleteButton->setEnabled(false);
     }
 
@@ -449,7 +448,6 @@ void ConfigWindow::loadSettings(void)
     settings.setValue("InputRedirection/ButtonConfig", buttonProfile);
     touchScreen->tsShortcutGui.loadNewShortcuts();
 
-    applyButton->setEnabled(buttonProfile != "Default");
     loadButton->setEnabled(false);
 }
 
