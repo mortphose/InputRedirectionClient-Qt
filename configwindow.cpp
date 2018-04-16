@@ -10,6 +10,8 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
 
     comboBoxProfiles = new QComboBox(nullptr);
     comboBoxProfiles->addItems(profileSettings.childGroups());
+    if (comboBoxProfiles->currentText() == "")
+        comboBoxProfiles->addItem("Default");
     comboBoxProfiles->setCurrentIndex(comboBoxProfiles->findText(buttonProfile));
 
     profileSettings.beginGroup(buttonProfile);
