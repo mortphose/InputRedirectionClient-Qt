@@ -69,3 +69,6 @@ RESOURCES += \
     images.qrc
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+
+RC_FILE = qt3DSir.rc
+
