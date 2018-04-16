@@ -6,6 +6,8 @@
 #include <QMessageBox>
 #include <QVariant>
 #include <QScreen>
+#include <QGroupBox>
+#include <QRadioButton>
 
 #include "touchscreen.h"
 #include "configwindow.h"
@@ -22,6 +24,7 @@ private:
     QPushButton  *homeButton, *powerButton, *longPowerButton, *settingsConfigButton,
                  *configGamepadButton;
     QLineEdit    *addrLineEdit;
+    QRadioButton *controllerRadio1, *controllerRadio2, *controllerRadio3, *controllerRadio4;
     QSlider      *touchOpacitySlider;
     QLabel       *creatorLabel, *titleLabel, *instructionsLabel;
     ConfigWindow *settingsConfig;
@@ -37,11 +40,24 @@ public:
     {
         layout = new QVBoxLayout(this);
 
+        formLayout = new QFormLayout();
+
+        QGroupBox *controllerGroupBox = new QGroupBox("Controller");
+        controllerRadio1 = new QRadioButton("1");
+        controllerRadio2 = new QRadioButton("2");
+        controllerRadio3 = new QRadioButton("3");
+        controllerRadio4 = new QRadioButton("4");
+        controllerRadio1->setChecked(true);
+        QHBoxLayout *controllerRadioLayout = new QHBoxLayout;
+        controllerRadioLayout->addWidget(controllerRadio1);
+        controllerRadioLayout->addWidget(controllerRadio2);
+        controllerRadioLayout->addWidget(controllerRadio3);
+        controllerRadioLayout->addWidget(controllerRadio4);
+        controllerGroupBox->setLayout(controllerRadioLayout);
+
         addrLineEdit = new QLineEdit(this);
         addrLineEdit->setClearButtonEnabled(true);
         addrLineEdit->setInputMethodHints(Qt::ImhPreferNumbers);
-
-        formLayout = new QFormLayout();
         formLayout->addRow(tr("IP address 📡"), addrLineEdit);
 
         touchOpacitySlider = new QSlider(Qt::Horizontal);
@@ -128,6 +144,7 @@ public:
         layout->setContentsMargins(10,10,10,0);
         layout->addWidget(titleLabel);
         layout->addSpacing(10);
+        layout->addWidget(controllerGroupBox);
         layout->addLayout(formLayout);
         layout->addWidget(lineA);
         layout->addWidget(homeButton);
@@ -246,6 +263,30 @@ public:
         {
             touchScreen->setWindowOpacity(value / 10.0);
             touchScreen->update();
+        });
+
+        connect(controllerRadio1, &QRadioButton::clicked, this,
+                [](void)
+        {
+           selectedControllerId = 0;
+        });
+
+        connect(controllerRadio2, &QRadioButton::clicked, this,
+                [](void)
+        {
+           selectedControllerId = 1;
+        });
+
+        connect(controllerRadio3, &QRadioButton::clicked, this,
+                [](void)
+        {
+           selectedControllerId = 2;
+        });
+
+        connect(controllerRadio4, &QRadioButton::clicked, this,
+                [](void)
+        {
+           selectedControllerId = 3;
         });
 
         if (QSysInfo::productType() != "android")

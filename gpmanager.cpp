@@ -5,8 +5,11 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
     connect(QGamepadManager::instance(), &QGamepadManager::gamepadButtonPressEvent, this,
         [this](int deviceId, QGamepadManager::GamepadButton button, double value)
     {
-        (void)deviceId;
         (void)value;
+
+        if (deviceId != selectedControllerId)
+            return;
+
         buttons |= QGamepadManager::GamepadButtons(1 << button);
 
         if (button == homeButton)
@@ -37,7 +40,9 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
     connect(QGamepadManager::instance(), &QGamepadManager::gamepadButtonReleaseEvent, this,
         [this](int deviceId, QGamepadManager::GamepadButton button)
     {
-        (void)deviceId;
+        if (deviceId != selectedControllerId)
+            return;
+
         buttons &= QGamepadManager::GamepadButtons(~(1 << button));
 
         if (button == homeButton)
@@ -69,9 +74,10 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
 
     connect(QGamepadManager::instance(), &QGamepadManager::gamepadAxisEvent, this,
         [this](int deviceId, QGamepadManager::GamepadAxis axis, double value)
-    {
-        (void)deviceId;
-        (void)value;
+    {        
+        if (deviceId != selectedControllerId)
+            return;
+
         QGamepadManager::GamepadAxis axLeftX = QGamepadManager::AxisLeftX,
                                      axLeftY= QGamepadManager::AxisLeftY,
                                      axRightX= QGamepadManager::AxisRightX,
@@ -255,5 +261,3 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
         }
     });
 }
-
-

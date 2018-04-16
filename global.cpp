@@ -23,6 +23,8 @@ GamepadConfigurator *gpConfigurator;
 
 QString ipAddress;
 
+int selectedControllerId = 0;
+
 bool touchScreenPressed;
 QSize touchScreenSize = QSize(TOUCH_SCREEN_WIDTH, TOUCH_SCREEN_HEIGHT);
 QPoint touchScreenPosition;

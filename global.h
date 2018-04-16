@@ -58,6 +58,8 @@ extern int yAxisMultiplier, yAxisMultiplierCpp;
 extern QString ipAddress;
 extern bool timerEnabled;
 
+extern int selectedControllerId;
+
 extern GamepadConfigurator *gpConfigurator;
 
 extern bool touchScreenPressed;
