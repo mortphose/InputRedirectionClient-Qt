@@ -41,6 +41,9 @@ TouchScreen::TouchScreen(QWidget *parent) : QWidget(parent)
     bgLabel->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
 
     ellipNeedDraw = true;
+
+    float loadedScale = profileSettings.value(buttonProfile+"/TouchScreen/Scale", 1).toDouble();
+    this->resize(TOUCH_SCREEN_WIDTH*loadedScale, TOUCH_SCREEN_HEIGHT*loadedScale);
 }
 
 void TouchScreen::ShowContextMenu(const QPoint& pos)
@@ -48,11 +51,14 @@ void TouchScreen::ShowContextMenu(const QPoint& pos)
     QMenu* myMenu = new QMenu();
     QString strOpenOverlay = "Open Overlay Image...";
     QString clearOverlayBtn = "Clear Overlay";
+    QString strSaveSize = "Save Touch Screen Scale";
     QString strPtToBtn = "Set point to button...";
     QPoint globalPos = this->mapToGlobal(pos);
 
     myMenu->addAction(strOpenOverlay);
     myMenu->addAction(clearOverlayBtn);
+    myMenu->addSeparator();
+    myMenu->addAction(strSaveSize);
     myMenu->addSeparator();
     myMenu->addAction(strPtToBtn);
 
@@ -106,6 +112,12 @@ void TouchScreen::ShowContextMenu(const QPoint& pos)
     if(selectedItem->text() == clearOverlayBtn)
     {
         clearImage();
+    }
+
+    if(selectedItem->text() == strSaveSize)
+    {
+        double scaleToSave = ((double)this->width()/TOUCH_SCREEN_WIDTH);
+        profileSettings.setValue(buttonProfile+"/TouchScreen/Scale", scaleToSave);
     }
 
     myMenu->deleteLater();
