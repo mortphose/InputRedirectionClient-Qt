@@ -42,7 +42,7 @@ public:
 
         formLayout = new QFormLayout();
 
-        QGroupBox *controllerGroupBox = new QGroupBox("Controller");
+        QGroupBox *controllerGroupBox = new QGroupBox("Controller Select 🎮");
         controllerRadio1 = new QRadioButton("1");
         controllerRadio2 = new QRadioButton("2");
         controllerRadio3 = new QRadioButton("3");
@@ -66,13 +66,13 @@ public:
         touchOpacitySlider->setTickInterval(1);
 
         if (QSysInfo::productType() != "android")
-            formLayout->addRow(tr("TS Opacity"), touchOpacitySlider);
+            formLayout->addRow(tr("TS Opacity 🔅"), touchOpacitySlider);
 
         homeButton = new QPushButton(tr("Home 🏠"), this);
         homeButton->setFocusPolicy(Qt::NoFocus);
-        powerButton = new QPushButton(tr("Power ⚫"), this);
+        powerButton = new QPushButton(tr("Power ⥁"), this);
         powerButton->setFocusPolicy(Qt::NoFocus);
-        longPowerButton = new QPushButton(tr("Power (long) ⚫⚫⚫"), this);
+        longPowerButton = new QPushButton(tr("Power-Long ⥁⥁⥁"), this);
         longPowerButton->setFocusPolicy(Qt::NoFocus);
         settingsConfigButton = new QPushButton(tr("Settings ⚙️"), this);
         settingsConfigButton->setFocusPolicy(Qt::NoFocus);

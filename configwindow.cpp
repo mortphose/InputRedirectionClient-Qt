@@ -90,12 +90,12 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
 
     profileSettings.endGroup();
 
-    applyButton = new QPushButton(tr("&APPLY"), this);
-    saveAsButton = new QPushButton(tr("&SAVE AS"), this);
+    applyButton = new QPushButton(tr("💾 &Save"), this);
+    saveAsButton = new QPushButton(tr("💾 Save &As"), this);
     saveAsButton->setEnabled(false);
-    loadButton = new QPushButton(tr("&LOAD"), this);
+    loadButton = new QPushButton(tr("💿 &Load"), this);
     loadButton->setEnabled(false);
-    deleteButton = new QPushButton(tr("&DELETE"), this);
+    deleteButton = new QPushButton(tr("🗑️ &Delete"), this);
 
     if (buttonProfile == "Default"){
         deleteButton->setEnabled(false);
@@ -171,39 +171,39 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     layout->addWidget(comboBoxPower, 7, 1);
     layout->addWidget(new QLabel("Power-Long"), 7, 2);
     layout->addWidget(comboBoxPowerLong, 7, 3);
-    layout->addWidget(new QLabel("Home Button"), 8, 0, 1, 2);
-    layout->addWidget(comboBoxHome, 8, 1, 1, 2);
+    layout->addWidget(new QLabel("Home Button"), 8, 0);
+    layout->addWidget(comboBoxHome, 8, 1, 1, 3);
     layout->addWidget(new QLabel("Stick Range:"), 9, 0);
-    layout->addWidget(txtStickVal, 9, 1, 2, 2);
-    layout->addWidget(new QLabel("CPP Range:"), 11, 0);
-    layout->addWidget(txtCppVal, 11, 1, 2, 2);
+    layout->addWidget(txtStickVal, 9, 1, 1, 3);
+    layout->addWidget(new QLabel("CPP Range:"), 10, 0);
+    layout->addWidget(txtCppVal, 10, 1, 1, 3);
 
-    layout->addWidget(new QLabel("Invert Y axis"), 17, 0);
-    layout->addWidget(invertYCheckbox, 17, 1);
-    layout->addWidget(new QLabel("Invert CPP Y"), 17, 2);
-    layout->addWidget(invertYCppCheckbox, 17, 3);
-    layout->addWidget(new QLabel("Swap CPads"), 18, 2);
-    layout->addWidget(swapSticksCheckbox, 18, 3);
-    layout->addWidget(new QLabel("Disable C"), 18, 0);
-    layout->addWidget(disableCStickCheckbox, 18, 1);
+    layout->addWidget(new QLabel("Invert Y axis"), 11, 0);
+    layout->addWidget(invertYCheckbox, 11, 1);
+    layout->addWidget(new QLabel("Invert CPP Y"), 11, 2);
+    layout->addWidget(invertYCppCheckbox, 11, 3);
+    layout->addWidget(new QLabel("Swap CPads"), 12, 2);
+    layout->addWidget(swapSticksCheckbox, 12, 3);
+    layout->addWidget(new QLabel("Disable C"), 12, 0);
+    layout->addWidget(disableCStickCheckbox, 12, 1);
 
-    layout->addWidget(new QLabel("RS as DPad"), 19, 0);
-    layout->addWidget(mhCameraCheckbox, 19, 1);
-    layout->addWidget(new QLabel("RS as Smash"), 20, 0);
-    layout->addWidget(rsSmashCheckbox, 20, 1);
-    layout->addWidget(new QLabel("RS as ABXY"), 19, 2);
-    layout->addWidget(rsFaceButtonsCheckbox, 19, 3);
-    layout->addWidget(new QLabel("RS as L+Pad"), 20, 2);
-    layout->addWidget(rsSamusReturnsCheckbox, 20, 3);
+    layout->addWidget(new QLabel("RS as DPad"), 13, 0);
+    layout->addWidget(mhCameraCheckbox, 13, 1);
+    layout->addWidget(new QLabel("RS as Smash"), 14, 0);
+    layout->addWidget(rsSmashCheckbox, 14, 1);
+    layout->addWidget(new QLabel("RS as ABXY"), 13, 2);
+    layout->addWidget(rsFaceButtonsCheckbox, 13, 3);
+    layout->addWidget(new QLabel("RS as L+Pad"), 14, 2);
+    layout->addWidget(rsSamusReturnsCheckbox, 14, 3);
 
-    layout->addWidget(applyButton, 21, 1, 1, 2);
+    layout->addWidget(applyButton, 15, 0, 1, 4);
 
-    layout->addWidget(saveAsButton, 22, 2, 1, 2);
-    layout->addWidget(configNameEdit, 22, 0, 1, 2);
+    layout->addWidget(saveAsButton, 16, 2, 1, 2);
+    layout->addWidget(configNameEdit, 16, 0, 1, 2);
 
-    layout->addWidget(comboBoxProfiles, 23, 1, 1, 2);
-    layout->addWidget(loadButton, 23, 0, 1, 1);
-    layout->addWidget(deleteButton, 23, 3, 1, 1);
+    layout->addWidget(comboBoxProfiles, 17, 0, 1, 2);
+    layout->addWidget(loadButton, 17, 2, 1, 1);
+    layout->addWidget(deleteButton, 17, 3, 1, 1);
 
     connect(applyButton, &QPushButton::pressed, this,
             [this, ts](void)
