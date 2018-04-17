@@ -227,6 +227,8 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
        applySettings();
        settings.setValue("InputRedirection/ButtonConfig", newName);
 
+       touchScreen->tsShortcutGui.loadNewShortcuts();
+
        comboBoxProfiles->addItem(buttonProfile);
        comboBoxProfiles->setCurrentIndex(comboBoxProfiles->findText(buttonProfile));
        applyButton->setEnabled(true);
