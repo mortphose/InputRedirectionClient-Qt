@@ -22,13 +22,13 @@ private:
                 *mhCameraCheckbox, *rsSmashCheckbox,
                 *disableCStickCheckbox, *rsFaceButtonsCheckbox, *rsSamusReturnsCheckbox;
 
-    QLineEdit *txtStickVal, *txtCppVal, *configNameEdit;
+    QLineEdit   *txtStickVal, *txtCppVal, *configNameEdit;
 
-    QValidator *validator;
+    QValidator  *validator;
 
-    TouchScreen * touchScreen;
+    TouchScreen *touchScreen;
 
-    QComboBox* populateItems(QGamepadManager::GamepadButton button);    
+    QComboBox* populateItems(QGamepadManager::GamepadButton button);
 
     QVariant currentData(QComboBox *comboBox);
 

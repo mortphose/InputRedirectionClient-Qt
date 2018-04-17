@@ -3,7 +3,7 @@
 
 class Settings
 {
- private:
+private:
     bool shouldSwapStick;
     bool monsterHunterCamera;
     bool rightStickSmash;
@@ -15,7 +15,7 @@ class Settings
     bool samusAimingV;
     bool samusAimingH;
 
- public:
+public:
     Settings()
     {
         shouldSwapStick = false;

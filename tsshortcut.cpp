@@ -238,12 +238,12 @@ void TsShortcut::connectHelpButtonEvent()
 
         msgBox->setText("Map Touchpad to Button");
         msgBox->setInformativeText(
-                QString("1. Right-click touchpad in the position you want then open this menu.\n")+
-                QString("2. Type a name for your shortcut in the textbox.\n")+
-                QString("3. Choose a button on the gamepad to map this point to.\n")+
-                QString("4. Choose a color for your shortcut,\n    (this will be the circle's color ")+
-                QString(   "on the touchscreen window)\n")+
-                QString("5. Press create, then close this window."));
+                    QString("1. Right-click touchpad in the position you want then open this menu.\n")+
+                    QString("2. Type a name for your shortcut in the textbox.\n")+
+                    QString("3. Choose a button on the gamepad to map this point to.\n")+
+                    QString("4. Choose a color for your shortcut,\n    (this will be the circle's color ")+
+                    QString(   "on the touchscreen window)\n")+
+                    QString("5. Press create, then close this window."));
         msgBox->show();
     });
 }

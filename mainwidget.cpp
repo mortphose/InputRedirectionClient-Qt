@@ -98,12 +98,12 @@ Widget::Widget(QWidget *parent) : QWidget(parent)
     setContextMenuPolicy(Qt::CustomContextMenu);
 
     // Disable/hide the configurator button if running windows since it's not supported
-     if (QSysInfo::productType() == "windows" ||
-         QSysInfo::productType() == "osx")
-     {
-         configGamepadButton->setEnabled(false);
-         configGamepadButton->setVisible(false);
-     }
+    if (QSysInfo::productType() == "windows" ||
+            QSysInfo::productType() == "osx")
+    {
+        configGamepadButton->setEnabled(false);
+        configGamepadButton->setVisible(false);
+    }
 
     layout->setContentsMargins(10,10,10,0);
     layout->addWidget(titleLabel);
@@ -138,29 +138,29 @@ Widget::Widget(QWidget *parent) : QWidget(parent)
     connect(configGamepadButton, &QPushButton::released, this,
             [](void)
     {
-       gpConfigurator->showGui();
-     });
+        gpConfigurator->showGui();
+    });
 
     connect(homeButton, &QPushButton::pressed, this,
             [](void)
     {
-       interfaceButtons |= 1;
+        interfaceButtons |= 1;
     });
 
     connect(homeButton, &QPushButton::released, this,
             [](void)
     {
-       interfaceButtons &= ~1;
+        interfaceButtons &= ~1;
     });
 
     connect(powerButton, &QPushButton::pressed, this,
             [](void)
     {
-       interfaceButtons |= 2;
+        interfaceButtons |= 2;
     });
 
     connect(QGamepadManager::instance(), &QGamepadManager::gamepadButtonReleaseEvent, this,
-        [](int deviceId, QGamepadManager::GamepadButton button)
+            [](int deviceId, QGamepadManager::GamepadButton button)
     {
         (void)deviceId;
 
@@ -168,48 +168,48 @@ Widget::Widget(QWidget *parent) : QWidget(parent)
 
         if(gpConfigurator->isVisible())
         {
-           gpConfigurator->getInput(deviceId, button);
+            gpConfigurator->getInput(deviceId, button);
             return;
         }
 
-            buttons &= QGamepadManager::GamepadButtons(~(1 << button));
+        buttons &= QGamepadManager::GamepadButtons(~(1 << button));
     });
 
     connect(gpConfigurator->skipButton, &QPushButton::released, this,
             [](void)
     {
-           gpConfigurator->next();
+        gpConfigurator->next();
     });
 
 
     connect(gpConfigurator->resetConfigButton, &QPushButton::released, this,
             [](void)
     {
-           QMessageBox *msgBox = new QMessageBox(0);
-           QGamepadManager::instance()->resetConfiguration(gpConfigurator->getCurDeviceId());
+        QMessageBox *msgBox = new QMessageBox(0);
+        QGamepadManager::instance()->resetConfiguration(gpConfigurator->getCurDeviceId());
 
-           msgBox->setText("Reset");
-           msgBox->setInformativeText("Please restart the program for changes to take affect.");
-           msgBox->show();
+        msgBox->setText("Reset");
+        msgBox->setInformativeText("Please restart the program for changes to take affect.");
+        msgBox->show();
 
     });
 
     connect(powerButton, &QPushButton::released, this,
             [](void)
     {
-       interfaceButtons &= ~2;
+        interfaceButtons &= ~2;
     });
 
     connect(longPowerButton, &QPushButton::pressed, this,
             [](void)
     {
-       interfaceButtons |= 4;
+        interfaceButtons |= 4;
     });
 
     connect(longPowerButton, &QPushButton::released, this,
             [](void)
     {
-       interfaceButtons &= ~4;
+        interfaceButtons &= ~4;
     });
 
     connect(settingsConfigButton, &QPushButton::released, this,
@@ -232,25 +232,25 @@ Widget::Widget(QWidget *parent) : QWidget(parent)
     connect(controllerRadio1, &QRadioButton::clicked, this,
             [](void)
     {
-       selectedControllerId = 0;
+        selectedControllerId = 0;
     });
 
     connect(controllerRadio2, &QRadioButton::clicked, this,
             [](void)
     {
-       selectedControllerId = 1;
+        selectedControllerId = 1;
     });
 
     connect(controllerRadio3, &QRadioButton::clicked, this,
             [](void)
     {
-       selectedControllerId = 2;
+        selectedControllerId = 2;
     });
 
     connect(controllerRadio4, &QRadioButton::clicked, this,
             [](void)
     {
-       selectedControllerId = 3;
+        selectedControllerId = 3;
     });
 
     if (QSysInfo::productType() != "android")
@@ -299,7 +299,7 @@ void Widget::showEvent(QShowEvent *event)
 
     listShortcuts.clear();
     uint shortCutCount =
-        profileSettings.value(buttonProfile+"/TouchScreen/Shortcut/Count").toInt();
+            profileSettings.value(buttonProfile+"/TouchScreen/Shortcut/Count").toInt();
 
     QString valPath = buttonProfile + "/TouchScreen/Shortcut/1";
     for(int i = 1; listShortcuts.size() < shortCutCount || i > 17; i++)

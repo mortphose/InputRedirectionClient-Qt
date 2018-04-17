@@ -25,7 +25,7 @@ private:
     QListWidget  *lstWidget;
     QLabel       *lblDirections;
     QPushButton  *btnColorDialog, *btnCreateShort,
-                 *btnDelShort, *btnHelp, *btnPressNow;
+    *btnDelShort, *btnHelp, *btnPressNow;
     QLineEdit*    txtShortName;
     QPoint        curPos;
     QComboBox*    cboxBtns;

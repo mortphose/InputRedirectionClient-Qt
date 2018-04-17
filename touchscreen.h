@@ -37,7 +37,7 @@ public:
     void clearImage(void);
     void paintEvent(QPaintEvent* e);
 
-   ~TouchScreen(void)
+    ~TouchScreen(void)
     {
         qDebug() << "DECON";
         tsShortcutGui.close();

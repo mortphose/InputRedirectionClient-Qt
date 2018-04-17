@@ -30,11 +30,11 @@ QSize touchScreenSize = QSize(TOUCH_SCREEN_WIDTH, TOUCH_SCREEN_HEIGHT);
 QPoint touchScreenPosition;
 
 QGamepadManager::GamepadButton homeButton =
-    variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonHome", QGamepadManager::ButtonInvalid));
+        variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonHome", QGamepadManager::ButtonInvalid));
 QGamepadManager::GamepadButton powerButton =
-    variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonPower", QGamepadManager::ButtonInvalid));
+        variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonPower", QGamepadManager::ButtonInvalid));
 QGamepadManager::GamepadButton powerLongButton =
-    variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonPowerLong", QGamepadManager::ButtonInvalid));
+        variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonPowerLong", QGamepadManager::ButtonInvalid));
 
 QGamepadManager::GamepadButton hidButtonsAB[2] = {
     variantToButton(profileSettings.value(buttonProfile+"/3DS/ButtonA", QGamepadManager::ButtonA)),
@@ -97,8 +97,8 @@ void Worker::sendFrame(void)
     u32 hidPad = 0xfff;
     for(u32 i = 0; i < 2; i++)
     {
-         if(buttons & (1 << hidButtonsAB[i]))
-                hidPad &= ~(1 << i);
+        if(buttons & (1 << hidButtonsAB[i]))
+            hidPad &= ~(1 << i);
     }
 
     for(u32 i = 2; i < 10; i++)
@@ -108,16 +108,16 @@ void Worker::sendFrame(void)
     }
 
     for(u32 i = 10; i < 12; i++)
-   {
-            if(buttons & (1 << hidButtonsXY[i-10]))
-                hidPad &= ~(1 << i);
-   }
+    {
+        if(buttons & (1 << hidButtonsXY[i-10]))
+            hidPad &= ~(1 << i);
+    }
 
     u32 irButtonsState = 0;
     for(u32 i = 0; i < 2; i++)
     {
-            if(buttons & (1 << irButtons[i]))
-                irButtonsState |= 1 << (i + 1);
+        if(buttons & (1 << irButtons[i]))
+            irButtonsState |= 1 << (i + 1);
     }
 
     u32 touchScreenState = 0x2000000;
@@ -136,33 +136,33 @@ void Worker::sendFrame(void)
     }
 
     if(leftAxis.x != 0.0 || leftAxis.y != 0.0)
-      {
-          u32 x = (u32)(leftAxis.x * CPAD_BOUND + 0x800);
-          u32 y = (u32)(leftAxis.y * CPAD_BOUND + 0x800);
-          x = x >= 0xfff ? (leftAxis.x < 0.0 ? 0x000 : 0xfff) : x;
-          y = y >= 0xfff ? (leftAxis.y < 0.0 ? 0x000 : 0xfff) : y;
+    {
+        u32 x = (u32)(leftAxis.x * CPAD_BOUND + 0x800);
+        u32 y = (u32)(leftAxis.y * CPAD_BOUND + 0x800);
+        x = x >= 0xfff ? (leftAxis.x < 0.0 ? 0x000 : 0xfff) : x;
+        y = y >= 0xfff ? (leftAxis.y < 0.0 ? 0x000 : 0xfff) : y;
 
-          circlePadState = (y << 12) | x;
-      }
+        circlePadState = (y << 12) | x;
+    }
 
-      if(rightAxis.x != 0.0 || rightAxis.y != 0.0 || irButtonsState != 0)
-      {
-          // We have to rotate the c-stick position 45°. Thanks, Nintendo.
-          u32 x = (u32)(M_SQRT1_2 * (rightAxis.x + rightAxis.y) * CPP_BOUND + 0x80);
-          u32 y = (u32)(M_SQRT1_2 * (rightAxis.y - rightAxis.x) * CPP_BOUND + 0x80);
-          x = x >= 0xff ? (rightAxis.x < 0.0 ? 0x00 : 0xff) : x;
-          y = y >= 0xff ? (rightAxis.y < 0.0 ? 0x00 : 0xff) : y;
+    if(rightAxis.x != 0.0 || rightAxis.y != 0.0 || irButtonsState != 0)
+    {
+        // We have to rotate the c-stick position 45°. Thanks, Nintendo.
+        u32 x = (u32)(M_SQRT1_2 * (rightAxis.x + rightAxis.y) * CPP_BOUND + 0x80);
+        u32 y = (u32)(M_SQRT1_2 * (rightAxis.y - rightAxis.x) * CPP_BOUND + 0x80);
+        x = x >= 0xff ? (rightAxis.x < 0.0 ? 0x00 : 0xff) : x;
+        y = y >= 0xff ? (rightAxis.y < 0.0 ? 0x00 : 0xff) : y;
 
-          cppState = (y << 24) | (x << 16) | (irButtonsState << 8) | 0x81;
-      }
+        cppState = (y << 24) | (x << 16) | (irButtonsState << 8) | 0x81;
+    }
 
-      QByteArray ba(20, 0);
-      qToLittleEndian(hidPad, (uchar *)ba.data());
-      qToLittleEndian(touchScreenState, (uchar *)ba.data() + 4);
-      qToLittleEndian(circlePadState, (uchar *)ba.data() + 8);
-      qToLittleEndian(cppState, (uchar *)ba.data() + 12);
-      qToLittleEndian(interfaceButtons, (uchar *)ba.data() + 16);
-      QUdpSocket().writeDatagram(ba, QHostAddress(ipAddress), 4950);
+    QByteArray ba(20, 0);
+    qToLittleEndian(hidPad, (uchar *)ba.data());
+    qToLittleEndian(touchScreenState, (uchar *)ba.data() + 4);
+    qToLittleEndian(circlePadState, (uchar *)ba.data() + 8);
+    qToLittleEndian(cppState, (uchar *)ba.data() + 12);
+    qToLittleEndian(interfaceButtons, (uchar *)ba.data() + 16);
+    QUdpSocket().writeDatagram(ba, QHostAddress(ipAddress), 4950);
 }
 
 QGamepadManager::GamepadButton variantToButton(QVariant variant)

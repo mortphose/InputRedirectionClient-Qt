@@ -17,39 +17,39 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     profileSettings.beginGroup(buttonProfile);
 
     comboBoxA = populateItems(variantToButton(
-        profileSettings.value("3DS/A", QGamepadManager::ButtonA)));
+                profileSettings.value("3DS/A", QGamepadManager::ButtonA)));
     comboBoxB = populateItems(variantToButton(
-        profileSettings.value("3DS/B", QGamepadManager::ButtonB)));
+                profileSettings.value("3DS/B", QGamepadManager::ButtonB)));
     comboBoxX = populateItems(variantToButton(
-        profileSettings.value("3DS/X", QGamepadManager::ButtonX)));
+                profileSettings.value("3DS/X", QGamepadManager::ButtonX)));
     comboBoxY = populateItems(variantToButton(
-        profileSettings.value("3DS/Y", QGamepadManager::ButtonY)));
+                profileSettings.value("3DS/Y", QGamepadManager::ButtonY)));
     comboBoxUp = populateItems(variantToButton(
-        profileSettings.value("3DS/Up", QGamepadManager::ButtonUp)));
+                profileSettings.value("3DS/Up", QGamepadManager::ButtonUp)));
     comboBoxDown = populateItems(variantToButton(
-        profileSettings.value("3DS/Down", QGamepadManager::ButtonDown)));
+                profileSettings.value("3DS/Down", QGamepadManager::ButtonDown)));
     comboBoxLeft = populateItems(variantToButton(
-        profileSettings.value("3DS/Left", QGamepadManager::ButtonLeft)));
+                profileSettings.value("3DS/Left", QGamepadManager::ButtonLeft)));
     comboBoxRight = populateItems(variantToButton(
-        profileSettings.value("3DS/Right", QGamepadManager::ButtonRight)));
+                profileSettings.value("3DS/Right", QGamepadManager::ButtonRight)));
     comboBoxL = populateItems(variantToButton(
-        profileSettings.value("3DS/L", QGamepadManager::ButtonL1)));
+                profileSettings.value("3DS/L", QGamepadManager::ButtonL1)));
     comboBoxR = populateItems(variantToButton(
-        profileSettings.value("3DS/R", QGamepadManager::ButtonR1)));
+                profileSettings.value("3DS/R", QGamepadManager::ButtonR1)));
     comboBoxSelect = populateItems(variantToButton(
-        profileSettings.value("3DS/Select", QGamepadManager::ButtonSelect)));
+                profileSettings.value("3DS/Select", QGamepadManager::ButtonSelect)));
     comboBoxStart = populateItems(variantToButton(
-        profileSettings.value("3DS/Start", QGamepadManager::ButtonStart)));
+                profileSettings.value("3DS/Start", QGamepadManager::ButtonStart)));
     comboBoxZL = populateItems(variantToButton(
-        profileSettings.value("3DS/ZL", QGamepadManager::ButtonL2)));
+                profileSettings.value("3DS/ZL", QGamepadManager::ButtonL2)));
     comboBoxZR = populateItems(variantToButton(
-        profileSettings.value("3DS/ZR", QGamepadManager::ButtonR2)));
+                profileSettings.value("3DS/ZR", QGamepadManager::ButtonR2)));
     comboBoxHome = populateItems(variantToButton(
-        profileSettings.value("3DS/Home", QGamepadManager::ButtonInvalid)));
+                profileSettings.value("3DS/Home", QGamepadManager::ButtonInvalid)));
     comboBoxPower = populateItems(variantToButton(
-        profileSettings.value("3DS/Power", QGamepadManager::ButtonInvalid)));
+                profileSettings.value("3DS/Power", QGamepadManager::ButtonInvalid)));
     comboBoxPowerLong = populateItems(variantToButton(
-        profileSettings.value("3DS/PowerLong", QGamepadManager::ButtonInvalid)));
+                profileSettings.value("3DS/PowerLong", QGamepadManager::ButtonInvalid)));
 
     txtCppVal = new QLineEdit();
     txtStickVal = new QLineEdit();
@@ -221,18 +221,18 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     connect(saveAsButton, &QPushButton::pressed, this,
             [this](void)
     {
-       QString newName = configNameEdit->text();
-       buttonProfile = newName.simplified();
-       profileSettings.setValue(buttonProfile+"/ButtonConfig/Name", newName);
-       applySettings();
-       settings.setValue("InputRedirection/ButtonConfig", newName);
+        QString newName = configNameEdit->text();
+        buttonProfile = newName.simplified();
+        profileSettings.setValue(buttonProfile+"/ButtonConfig/Name", newName);
+        applySettings();
+        settings.setValue("InputRedirection/ButtonConfig", newName);
 
-       touchScreen->tsShortcutGui.loadNewShortcuts();
+        touchScreen->tsShortcutGui.loadNewShortcuts();
 
-       comboBoxProfiles->addItem(buttonProfile);
-       comboBoxProfiles->setCurrentIndex(comboBoxProfiles->findText(buttonProfile));
-       applyButton->setEnabled(true);
-       saveAsButton->setEnabled(false);
+        comboBoxProfiles->addItem(buttonProfile);
+        comboBoxProfiles->setCurrentIndex(comboBoxProfiles->findText(buttonProfile));
+        applyButton->setEnabled(true);
+        saveAsButton->setEnabled(false);
     });
 
     connect(comboBoxProfiles, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
@@ -246,13 +246,13 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     connect(loadButton, &QPushButton::pressed, this,
             [this](void)
     {
-       loadSettings();
+        loadSettings();
     });
 
     connect(deleteButton, &QPushButton::pressed, this,
             [this](void)
     {
-       deleteProfile();
+        deleteProfile();
     });
 
     applySettings();

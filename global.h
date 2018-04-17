@@ -84,7 +84,7 @@ struct MyAxis
 
 class Worker : public QObject {
     Q_OBJECT
- public:
+public:
 
     MyAxis getLeftAxis();
     MyAxis getRightAxis();
@@ -105,14 +105,14 @@ class Worker : public QObject {
 
     }
 
- public slots:
+public slots:
     void sendFrame();
 
- signals:
+signals:
     void finished();
     void error(QString err);
 
- private:
+private:
     MyAxis leftAxis;
     MyAxis rightAxis;
     MyAxis previousLeftAxis;

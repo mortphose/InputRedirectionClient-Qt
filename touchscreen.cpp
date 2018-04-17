@@ -9,7 +9,7 @@ void TouchScreen::setTouchScreenPressed(bool b)
 
 bool TouchScreen::isTouchScreenPressed()
 {
-   return touchScreenPressed;
+    return touchScreenPressed;
 }
 
 QSize TouchScreen::getTouchScreenSize()
@@ -70,7 +70,7 @@ void TouchScreen::ShowContextMenu(const QPoint& pos)
     newPos.setY(pos.y());
     //If custom size, scale the point to orig 3ds touchscreen size
     if(this->width() != TOUCH_SCREEN_WIDTH ||
-       this->height() != TOUCH_SCREEN_HEIGHT)
+            this->height() != TOUCH_SCREEN_HEIGHT)
     {
         newPos.setX((TOUCH_SCREEN_WIDTH*pos.x())/this->width());
         newPos.setY((TOUCH_SCREEN_HEIGHT*pos.y())/this->height());
@@ -88,14 +88,14 @@ void TouchScreen::ShowContextMenu(const QPoint& pos)
     if(selectedItem->text() == strOpenOverlay)
     {
         QString strPic = QFileDialog::getOpenFileName(this,
-                       tr("Open Touchscreen Image (320x240)"), "MyDocuments",
-                       tr("Image Files (*.jpg *.jpeg *.png *.bmp *.gif *.pbm *.pgm *.ppm *.xbm *.xpm)"));
+                tr("Open Touchscreen Image (320x240)"), "MyDocuments",
+                tr("Image Files (*.jpg *.jpeg *.png *.bmp *.gif *.pbm *.pgm *.ppm *.xbm *.xpm)"));
 
-         if(!strPic.isNull())
-         {
-             profileSettings.setValue(buttonProfile+"/TouchScreen/Image", strPic);
-             updatePixmap();
-         }
+        if(!strPic.isNull())
+        {
+            profileSettings.setValue(buttonProfile+"/TouchScreen/Image", strPic);
+            updatePixmap();
+        }
     }
 
     if(selectedItem->text() == strPtToBtn )
@@ -125,28 +125,28 @@ void TouchScreen::ShowContextMenu(const QPoint& pos)
 
 void TouchScreen::resizeEvent(QResizeEvent* e)
 {
-        QSize newWinSize = e->size();
-        QSize curWinSize = e->oldSize();
-        QSize propWinSize = e->size();
+    QSize newWinSize = e->size();
+    QSize curWinSize = e->oldSize();
+    QSize propWinSize = e->size();
 
-        if(curWinSize.height() != newWinSize.height())
-        {
-            propWinSize.setWidth((TOUCH_SCREEN_WIDTH*newWinSize.height())/TOUCH_SCREEN_HEIGHT);
-           propWinSize.setHeight(newWinSize.height());
-        }
+    if(curWinSize.height() != newWinSize.height())
+    {
+        propWinSize.setWidth((TOUCH_SCREEN_WIDTH*newWinSize.height())/TOUCH_SCREEN_HEIGHT);
+        propWinSize.setHeight(newWinSize.height());
+    }
 
-        if(curWinSize.width() != newWinSize.width())
-        {
-            propWinSize.setWidth(newWinSize.width());
-            propWinSize.setHeight((TOUCH_SCREEN_HEIGHT*newWinSize.width())/TOUCH_SCREEN_WIDTH);
-        }
+    if(curWinSize.width() != newWinSize.width())
+    {
+        propWinSize.setWidth(newWinSize.width());
+        propWinSize.setHeight((TOUCH_SCREEN_HEIGHT*newWinSize.width())/TOUCH_SCREEN_WIDTH);
+    }
 
-        touchScreenSize = propWinSize;
-        this->resize(propWinSize);
-        bgLabel->setFixedHeight(this->height());
-        bgLabel->setFixedWidth(this->width());
+    touchScreenSize = propWinSize;
+    this->resize(propWinSize);
+    bgLabel->setFixedHeight(this->height());
+    bgLabel->setFixedWidth(this->width());
 
-        tsRatio = (double)this->width() / (double)TOUCH_SCREEN_WIDTH;
+    tsRatio = (double)this->width() / (double)TOUCH_SCREEN_WIDTH;
 }
 
 void TouchScreen::mousePressEvent(QMouseEvent *ev)
@@ -219,14 +219,14 @@ void TouchScreen::paintEvent(QPaintEvent* e)
         painter.setBrush(QBrush(curShort.color));
         painter.setPen(pen);
         painter.drawEllipse(
-            TOUCH_SCREEN_WIDTH*((height()*curShort.pos.x())/TOUCH_SCREEN_HEIGHT)/width(),
-            TOUCH_SCREEN_HEIGHT*((width()*curShort.pos.y())/TOUCH_SCREEN_WIDTH)/height(),
-            7, 7);
+                    TOUCH_SCREEN_WIDTH*((height()*curShort.pos.x())/TOUCH_SCREEN_HEIGHT)/width(),
+                    TOUCH_SCREEN_HEIGHT*((width()*curShort.pos.y())/TOUCH_SCREEN_WIDTH)/height(),
+                    7, 7);
     }
 
-     bgLabel->setPixmap(newPic);
-     bgLabel->show();
-     e->accept();
+    bgLabel->setPixmap(newPic);
+    bgLabel->show();
+    e->accept();
 }
 
 void TouchScreen::clearImage(void)
