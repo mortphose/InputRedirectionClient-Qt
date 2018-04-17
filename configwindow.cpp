@@ -449,6 +449,8 @@ void ConfigWindow::loadSettings(void)
     applySettings();
     settings.setValue("InputRedirection/ButtonConfig", buttonProfile);
     touchScreen->tsShortcutGui.loadNewShortcuts();
+    double newTSScale = profileSettings.value(buttonProfile+"/TouchScreen/Scale", 1).toDouble();
+    touchScreen->resize(TOUCH_SCREEN_WIDTH*newTSScale, TOUCH_SCREEN_HEIGHT*newTSScale);
 
     loadButton->setEnabled(false);
 }
