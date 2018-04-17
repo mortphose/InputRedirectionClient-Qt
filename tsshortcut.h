@@ -14,14 +14,9 @@ public:
     TsShortcut(QWidget *parent = nullptr);
 
     void setCurrentPos(QPoint pos);
-
     void updateTitleText();
-
     void showEvent(QShowEvent * event);
-
     void loadNewShortcuts(void);
-
-    QComboBox* populateItems();
 
 private:
     QString       wTitle;
@@ -35,6 +30,22 @@ private:
     QPoint        curPos;
     QComboBox*    cboxBtns;
     QColor        curColor;
+
+    QComboBox* populateItems();
+
+    void instantiateWidgets();
+    void addWidgetsToLayout();
+    void connectEvents();
+    void connectColorButtonEvent();
+    void connectCreateButtonEvent();
+    void connectDeleteButtonEvent();
+    void connectPressButtonEvent();
+    void connectHelpButtonEvent();
+    void connectNameChangeEvent();
+    void connectButtonChangeEvent();
+    void connectSelectedChangeEvent();
+    void saveShortcut(uint i);
+    QListWidgetItem * createShortcutListItem(ShortCut newShortCut);
 };
 
 #endif // TSSHORTCUT_H

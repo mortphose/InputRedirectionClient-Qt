@@ -49,18 +49,18 @@ TouchScreen::TouchScreen(QWidget *parent) : QWidget(parent)
 void TouchScreen::ShowContextMenu(const QPoint& pos)
 {
     QMenu* myMenu = new QMenu();
-    QString strOpenOverlay = "Open Overlay Image...";
+    QString strOpenOverlay = "Set Overlay Image...";
     QString clearOverlayBtn = "Clear Overlay";
     QString strSaveSize = "Save Touch Screen Scale";
     QString strPtToBtn = "Set point to button...";
     QPoint globalPos = this->mapToGlobal(pos);
 
-    myMenu->addAction(strOpenOverlay);
-    myMenu->addAction(clearOverlayBtn);
+    myMenu->addAction(strPtToBtn);
     myMenu->addSeparator();
     myMenu->addAction(strSaveSize);
     myMenu->addSeparator();
-    myMenu->addAction(strPtToBtn);
+    myMenu->addAction(strOpenOverlay);
+    myMenu->addAction(clearOverlayBtn);
 
     myMenu->popup(globalPos);
     QAction* selectedItem = myMenu->exec(globalPos);
@@ -210,7 +210,7 @@ void TouchScreen::paintEvent(QPaintEvent* e)
     pen.setWidth(2);
     //painter.setBrush(QBrush(Qt::black));
     pen.setColor(Qt::black);
-    painter.setRenderHint(QPainter::Antialiasing, true);
+    //painter.setRenderHint(QPainter::Antialiasing, true);
 
     for (unsigned i = 0; i < listShortcuts.size(); ++i)
     {
