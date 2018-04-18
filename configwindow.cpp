@@ -79,9 +79,9 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     invertYCppCheckbox->setChecked(profileSettings.value("Misc/invertCPPY", false).toBool());
     swapSticksCheckbox->setChecked(profileSettings.value("Misc/swapSticks", false).toBool());
     disableCStickCheckbox->setChecked(profileSettings.value("Misc/DisableC", false).toBool());
-    mhCameraCheckbox->setChecked(profileSettings.value("RightStick/monsterHunterCamera", false).toBool());
-    rsSmashCheckbox->setChecked(profileSettings.value("RightStick/rightStickSmash", false).toBool());
-    rsFaceButtonsCheckbox->setChecked(profileSettings.value("RightStick/rightStickABXY", false).toBool());
+    mhCameraCheckbox->setChecked(profileSettings.value("RightStick/DPad", false).toBool());
+    rsSmashCheckbox->setChecked(profileSettings.value("RightStick/Smash", false).toBool());
+    rsFaceButtonsCheckbox->setChecked(profileSettings.value("RightStick/ABXY", false).toBool());
     rsSamusReturnsCheckbox->setChecked(profileSettings.value("RightStick/SamusReturns", false).toBool());
 
     configNameEdit = new QLineEdit(this);
