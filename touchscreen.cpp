@@ -24,7 +24,10 @@ QPoint TouchScreen::getTouchScreenPosition()
 
 TouchScreen::TouchScreen(QWidget *parent) : QWidget(parent)
 {
-    this->setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint);
+    Qt::WindowFlags windowFlags = Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint;
+    if (QSysInfo::productType() == "windows")
+        windowFlags |=  Qt::MSWindowsFixedSizeDialogHint;
+    this->setWindowFlags(windowFlags);
     this->setWindowTitle(tr("InputRedirectionClient-Qt - Touch screen"));
     this->setContextMenuPolicy(Qt::CustomContextMenu);
 

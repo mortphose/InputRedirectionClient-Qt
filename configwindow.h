@@ -4,6 +4,7 @@
 #include "global.h"
 #include "touchscreen.h"
 #include <QComboBox>
+#include <QDoubleSpinBox>
 
 class ConfigWindow : public QDialog
 {
@@ -27,6 +28,8 @@ private:
     QValidator  *validator;
 
     TouchScreen *touchScreen;
+
+    QDoubleSpinBox *windowsTouchScreenScale;
 
     QComboBox* populateItems(QGamepadManager::GamepadButton button);
 

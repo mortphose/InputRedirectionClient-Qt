@@ -88,6 +88,14 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     configNameEdit->setClearButtonEnabled(true);
     configNameEdit->setText(profileSettings.value("ButtonConfig/Name", "Default").toString());
 
+    if (QSysInfo::productType() == "windows")
+    {
+        windowsTouchScreenScale = new QDoubleSpinBox();
+        windowsTouchScreenScale->setSingleStep(0.1);
+        windowsTouchScreenScale->setMinimum(1.0);
+        windowsTouchScreenScale->setValue(profileSettings.value("/TouchScreen/Scale", 1.0).toDouble());
+    }
+
     profileSettings.endGroup();
 
     applyButton = new QPushButton(tr("💾 &Save"), this);
@@ -205,6 +213,20 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
     layout->addWidget(loadButton, 17, 2, 1, 1);
     layout->addWidget(deleteButton, 17, 3, 1, 1);
 
+    if (QSysInfo::productType() == "windows")
+    {
+        QFrame *lineA = new QFrame;
+        lineA->setFrameShape(QFrame::HLine);
+        lineA->setFrameShadow(QFrame::Sunken);
+        QFrame *lineB = new QFrame;
+        lineB->setFrameShape(QFrame::HLine);
+        lineB->setFrameShadow(QFrame::Sunken);
+        layout->addWidget(lineA, 18, 0, 1, 4);
+        layout->addWidget(lineB, 19, 0, 1, 4);
+        layout->addWidget(new QLabel("Touch Screen Scale"), 20, 0, 1, 2);
+        layout->addWidget(windowsTouchScreenScale, 20, 2, 1, 2);
+    }
+
     connect(applyButton, &QPushButton::pressed, this,
             [this, ts](void)
     {
@@ -217,6 +239,15 @@ ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
         QString toCheck = text.simplified();
         saveAsButton->setEnabled(toCheck != buttonProfile && toCheck != "Default" && toCheck != "");
     });
+
+    if (QSysInfo::productType() == "windows")
+    {
+        connect(windowsTouchScreenScale, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+            [=](double d)
+        {
+            touchScreen->resize(TOUCH_SCREEN_WIDTH*d, TOUCH_SCREEN_HEIGHT*d);
+        });
+    }
 
     connect(saveAsButton, &QPushButton::pressed, this,
             [this](void)
@@ -443,6 +474,11 @@ void ConfigWindow::loadSettings(void)
 
     txtCppVal->setText(profileSettings.value("3DS/CppBound", 127).toString());
     txtStickVal->setText(profileSettings.value("3DS/StickBound", 1488).toString());
+
+    if (QSysInfo::productType() == "windows")
+    {
+        windowsTouchScreenScale->setValue(profileSettings.value("/TouchScreen/Scale", 1.0).toDouble());
+    }
 
     profileSettings.endGroup();
 
