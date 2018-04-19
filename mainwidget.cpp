@@ -74,8 +74,8 @@ Widget::Widget(QWidget *parent) : QWidget(parent)
     instructionsLabel->setAlignment(Qt::AlignLeft);
     instructionsLabel->setText("<html><b>Instructions:</b>"
                                "<br>1. Start InputRedirection on your 3DS via Rosalina menu (Press L+⬇️+Select)."
-                               "<br>2. Connect your Gamepad to your Android device.</br>"
-                               "<br>3. Enter the IP address displayed on your 3DS in the IRC application.</br>"
+                               "<br>2. Connect your Gamepad to your device.</br>"
+                               "<br>3. Enter the IP address of your 3DS.</br>"
                                "<br>ℹ️ Work via Wi-Fi or via Mobile Data if both devices share the same network.</br></html>");
     instructionsLabel->setTextFormat(Qt::RichText);
     instructionsLabel->setWordWrap(true);
@@ -84,8 +84,9 @@ Widget::Widget(QWidget *parent) : QWidget(parent)
     creatorLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     creatorLabel->setAlignment(Qt::AlignCenter);
     creatorLabel->setText("<html>Created by <a href=\"https://github.com/TuxSH/\">TuxSH</a>"
-                          "<br>Based on <a href=\"https://github.com/mastermune/\">mastermune</a> & <a href=\"https://github.com/gbrown5/\">gbrown5</a>'s forks"
-                          "<br>Version "+version+" for Android by JambonBeurreMan</html>");
+                          "<br>Fork "+version+" by <a href=\"https://github.com/mastermune/\">mastermune</a>, "
+                          "<a href=\"https://github.com/gbrown5/\">gbrown5</a>"
+                          " & <a href=\"https://github.com/JambonBeurreMan/\">JambonBeurreMan</a></html>");
     creatorLabel->setTextFormat(Qt::RichText);
     creatorLabel->setOpenExternalLinks(true);
 

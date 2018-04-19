@@ -210,7 +210,7 @@ void TouchScreen::paintEvent(QPaintEvent* e)
     QPainter painter;
     painter.begin(&newPic);
     QPen pen;
-    pen.setWidth(2);
+    pen.setWidth(1);
     //painter.setBrush(QBrush(Qt::black));
     pen.setColor(Qt::black);
     //painter.setRenderHint(QPainter::Antialiasing, true);
@@ -221,10 +221,10 @@ void TouchScreen::paintEvent(QPaintEvent* e)
         //pen.setColor(curShort.color);
         painter.setBrush(QBrush(curShort.color));
         painter.setPen(pen);
-        painter.drawEllipse(
+        painter.drawEllipse(QPoint(
                     TOUCH_SCREEN_WIDTH*((height()*curShort.pos.x())/TOUCH_SCREEN_HEIGHT)/width(),
-                    TOUCH_SCREEN_HEIGHT*((width()*curShort.pos.y())/TOUCH_SCREEN_WIDTH)/height(),
-                    7, 7);
+                    TOUCH_SCREEN_HEIGHT*((width()*curShort.pos.y())/TOUCH_SCREEN_WIDTH)/height()),
+                    3, 3);
     }
 
     bgLabel->setPixmap(newPic);
