@@ -3,6 +3,8 @@
 
 ConfigWindow::ConfigWindow(QWidget *parent, TouchScreen *ts) : QDialog(parent)
 {
+    if (!(QSysInfo::productType() == "android"))
+        this->setFixedSize(TOUCH_SCREEN_WIDTH, 600);
     this->setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint);
     this->setWindowTitle(tr("InputRedirectionClient-Qt - Button Config"));
 

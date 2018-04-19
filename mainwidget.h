@@ -39,7 +39,7 @@ private:
     QVBoxLayout  *layout;
     QFormLayout  *formLayout;
     QPushButton  *homeButton, *powerButton, *longPowerButton, *settingsConfigButton,
-    *configGamepadButton;
+                 *configGamepadButton;
     QLineEdit    *addrLineEdit;
     QRadioButton *controllerRadio1, *controllerRadio2, *controllerRadio3, *controllerRadio4;
     QSlider      *touchOpacitySlider;

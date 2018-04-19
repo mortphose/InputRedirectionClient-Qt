@@ -217,7 +217,7 @@ Widget::Widget(QWidget *parent) : QWidget(parent)
     {
         if (!settingsConfig->isVisible())
         {
-            settingsConfig->move(this->x() - settingsConfig->width() - 5,this->y());
+            settingsConfig->move(this->x() - settingsConfig->width() - 10,this->y());
             settingsConfig->show();
         } else settingsConfig->hide();
     });
@@ -266,7 +266,7 @@ void Widget::show(void)
     QWidget::show();
     if (QSysInfo::productType() != "android")
     {
-        touchScreen->move(this->x() + this->width() + 5,this->y());
+        touchScreen->move(this->x() + this->frameSize().width(),this->y());
         touchScreen->show();
     }
 }
