@@ -4,14 +4,15 @@
 </p>
 
 Input redirection client for the 3DS using QtGamepad.
+This edition is only supported by me on Linux distros. If you are using the Android, Windows, or MacOS builds, you'll wanna use those instead. I will not fix/maintain those other versions.
 
-  Supported platforms:
+Currently, multiple controller support is broken. I think it was utilizing a Windows aspect that made it not work on Linux at all.
 
-    Optimized for :
-    * Windows (via xinput, if you don't have a Xbox controller you should use x360ce)
+  Build instructions:
 
-    Non-optimized for (but also work) :
-    * Android (4.1 and above via InputDevice API)
-    * Linux (via evdev)
-    * OSX
-    * maybe others?
+    Dependencies:
+    qt5-base
+    qt5-gamepad
+
+    qmake
+    make
