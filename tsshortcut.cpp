@@ -148,7 +148,7 @@ void TsShortcut::connectCreateButtonEvent()
             {
                 saveShortcut(i);
             }
-            profileSettings.setValue(buttonProfile+"/TouchScreen/Shortcut/Count", listShortcuts.size());
+            profileSettings.setValue(buttonProfile+"/TouchScreen/Shortcut/Count", QVariant::fromValue(listShortcuts.size()));
         }
         else
         {
@@ -164,7 +164,7 @@ void TsShortcut::connectCreateButtonEvent()
 QListWidgetItem * TsShortcut::createShortcutListItem(ShortCut newShortCut)
 {
     QListWidgetItem *listItemToAdd = new QListWidgetItem(newShortCut.name);
-    listItemToAdd->setBackgroundColor(newShortCut.color);
+    listItemToAdd->setBackground(newShortCut.color);
     listItemToAdd->setForeground((newShortCut.color.green() > 127)? Qt::black : Qt::white);
 
     return listItemToAdd;
@@ -201,7 +201,7 @@ void TsShortcut::connectDeleteButtonEvent()
             profileSettings.remove(toRemove+"B");
 
             listShortcuts.erase(listShortcuts.begin()+(lstWidget->currentRow()));
-            profileSettings.setValue(buttonProfile+"/TouchScreen/Shortcut/Count", listShortcuts.size());
+            profileSettings.setValue(buttonProfile+"/TouchScreen/Shortcut/Count", QVariant::fromValue(listShortcuts.size()));
             qDeleteAll(lstWidget->selectedItems());
         }
 

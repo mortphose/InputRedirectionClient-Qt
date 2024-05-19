@@ -12,7 +12,7 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
     {
         (void)value;
 
-        if (deviceId != selectedControllerId) return;
+        //if (deviceId != selectedControllerId) return;
 
         buttons |= QGamepadManager::GamepadButtons(1 << button);
 
@@ -44,7 +44,7 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
     connect(QGamepadManager::instance(), &QGamepadManager::gamepadButtonReleaseEvent, this,
             [this](int deviceId, QGamepadManager::GamepadButton button)
     {
-        if (deviceId != selectedControllerId) return;
+        //if (deviceId != selectedControllerId) return;
 
         buttons &= QGamepadManager::GamepadButtons(~(1 << button));
 
@@ -76,7 +76,7 @@ GamepadMonitor::GamepadMonitor(QObject *parent) : QObject(parent)
     connect(QGamepadManager::instance(), &QGamepadManager::gamepadAxisEvent, this,
             [this](int deviceId, QGamepadManager::GamepadAxis axis, double value)
     {
-        if (deviceId != selectedControllerId) return;
+        //if (deviceId != selectedControllerId) return;
 
         if(btnSettings.isShouldSwapStick())
         {
