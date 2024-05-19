@@ -6,6 +6,7 @@ Widget::Widget(QWidget *parent) : QWidget(parent)
 
     formLayout = new QFormLayout();
 
+    //Controller selection is broken on linux. TODO: figure it out
     QGroupBox *controllerGroupBox = new QGroupBox("Controller Select 🎮");
     controllerRadio1 = new QRadioButton("1");
     controllerRadio2 = new QRadioButton("2");
@@ -18,6 +19,7 @@ Widget::Widget(QWidget *parent) : QWidget(parent)
     controllerRadioLayout->addWidget(controllerRadio3);
     controllerRadioLayout->addWidget(controllerRadio4);
     controllerGroupBox->setLayout(controllerRadioLayout);
+    controllerGroupBox->setVisible(false);
 
     addrLineEdit = new QLineEdit(this);
     addrLineEdit->setClearButtonEnabled(true);
@@ -84,7 +86,8 @@ Widget::Widget(QWidget *parent) : QWidget(parent)
     creatorLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     creatorLabel->setAlignment(Qt::AlignCenter);
     creatorLabel->setText("<html>Created by <a href=\"https://github.com/TuxSH/\">TuxSH</a>"
-                          "<br>Fork "+version+" by <a href=\"https://github.com/mastermune/\">mastermune</a>, "
+                          "<br>Linux fork by <a href=\"https://github.com/mortphose/\">mortphose</a>"
+                          "<br>Original fork by <a href=\"https://github.com/mastermune/\">mastermune</a>, "
                           "<a href=\"https://github.com/gbrown5/\">gbrown5</a>"
                           " & <a href=\"https://github.com/JambonBeurreMan/\">JambonBeurreMan</a></html>");
     creatorLabel->setTextFormat(Qt::RichText);
